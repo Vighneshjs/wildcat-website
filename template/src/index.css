@@ -2,7 +2,7 @@ body { margin: 0; background: #f6f1ea; }
 .vg-meta address { font-style: normal; }
 .vg-meta a, .vg-policies a, .vg-fcap a { color: inherit; text-underline-offset: .18em; text-decoration: underline; }
 .vg-meta a { display: block; overflow-wrap: anywhere; }
-.vg-policies { margin-top: 1.25rem; font: 0.875rem/1.6 VgSans, sans-serif; }
+.vg-policies { margin-top: 1.25rem; font: 0.875rem/1.6 "Source Sans 3", sans-serif; }
 .vg-policies details { margin-bottom: .5rem; }
 .vg-policies summary { cursor: pointer; width: fit-content; }
 .vg-policies p { max-width: 55ch; }
