@@ -123,21 +123,21 @@ type Tile = { x: number; y: number; w: number; a: number; d: number; src: string
 const FEATURE = "/media/wildcat-gaming-pc-kollam.webp"
 const TILES: Tile[] = [
   { x: 7, y: 8, w: 9, a: 1.28, d: 0.8, src: "/media/detail-01.webp", t: "Red-lit gaming PC tower", c: "Gaming build" },
-  { x: 19.5, y: -4, w: 7, a: 0.9, d: 1.2, src: "/media/detail-02.webp", t: "Gaming monitor on the Wildcat desk" },
-  { x: 27, y: 21, w: 7, a: 0.95, d: 0.55, src: "/media/detail-03.webp", t: "Red case fans in the gaming PC" },
+  { x: 19.5, y: -4, w: 7, a: 0.9, d: 1.2, src: "/media/hardware-02.webp", t: "Precision tools used on a laptop board" },
+  { x: 27, y: 21, w: 7, a: 0.95, d: 0.55, src: "/media/hardware-03.webp", t: "Blue-lit desktop graphics card and cooling fans" },
   { x: 50, y: 14, w: 7, a: 1.3, d: 0.9, src: "/media/detail-04.webp", t: "Wildcat emblem on the shop wall" },
-  { x: 60.5, y: -3, w: 7, a: 1.25, d: 1.1, src: "/media/detail-05.webp", t: "Keyboard on the Wildcat worktop" },
-  { x: 71, y: 20, w: 7, a: 0.85, d: 0.6, src: "/media/detail-06.webp", t: "Speaker beside the monitor" },
-  { x: 83, y: -1, w: 9, a: 1.05, d: 1, src: "/media/detail-07.webp", t: "Side panel of the gaming PC" },
-  { x: 95.5, y: 2, w: 5, a: 2.6, d: 1.3, src: "/media/detail-08.webp", t: "Wildcat IT Solutions wall sign" },
-  { x: 89, y: 32, w: 6.5, a: 1.2, d: 0.7, src: "/media/detail-09.webp", t: "Monitor and stand at Wildcat" },
-  { x: 3, y: 54, w: 7, a: 0.95, d: 0.75, src: "/media/detail-10.webp", t: "Front of the red-lit PC" },
-  { x: -1, y: 80, w: 4.5, a: 2.2, d: 1.2, src: "/media/detail-11.webp", t: "Left side of the desktop setup" },
-  { x: 22, y: 93, w: 5.5, a: 0.9, d: 1, src: "/media/detail-12.webp", t: "Top and side of the gaming case" },
-  { x: 41, y: 82, w: 7, a: 1.2, d: 0.65, src: "/media/detail-13.webp", t: "Gaming monitor stand and keyboard" },
-  { x: 60, y: 87, w: 7, a: 1.05, d: 0.95, src: "/media/detail-14.webp", t: "Monitor beside the desktop tower" },
+  { x: 60.5, y: -3, w: 7, a: 1.25, d: 1.1, src: "/media/hardware-05.webp", t: "Screwdriver servicing an open laptop motherboard" },
+  { x: 71, y: 20, w: 7, a: 0.85, d: 0.6, src: "/media/hardware-06.webp", t: "Desktop tower with illuminated fans and memory" },
+  { x: 83, y: -1, w: 9, a: 1.05, d: 1, src: "/media/hardware-07.webp", t: "White-lit gaming PC cooling hardware" },
+  { x: 95.5, y: 2, w: 5, a: 2.6, d: 1.3, src: "/media/detail-08.webp", t: "Hands inspecting a desktop circuit board" },
+  { x: 89, y: 32, w: 6.5, a: 1.2, d: 0.7, src: "/media/hardware-09.webp", t: "Hands working on the internals of a laptop" },
+  { x: 3, y: 54, w: 7, a: 0.95, d: 0.75, src: "/media/hardware-10.webp", t: "Dark desktop build with a graphics card and liquid cooler" },
+  { x: -1, y: 80, w: 4.5, a: 2.2, d: 1.2, src: "/media/hardware-11.webp", t: "Close-up of tools and a laptop circuit board" },
+  { x: 22, y: 93, w: 5.5, a: 0.9, d: 1, src: "/media/hardware-12.webp", t: "Memory modules inside a gaming PC" },
+  { x: 41, y: 82, w: 7, a: 1.2, d: 0.65, src: "/media/hardware-13.webp", t: "Graphics card and radiator in a desktop PC" },
+  { x: 60, y: 87, w: 7, a: 1.05, d: 0.95, src: "/media/hardware-14.webp", t: "Gaming computer with a liquid cooling loop" },
   { x: 78, y: 74, w: 9, a: 1.3, d: 0.8, src: "/media/detail-15.webp", t: "Full desktop setup at Wildcat", c: "Meeyanoor" },
-  { x: 96, y: 68, w: 4.5, a: 1.1, d: 1.15, src: "/media/detail-16.webp", t: "Detail of the Wildcat emblem" },
+  { x: 96, y: 68, w: 4.5, a: 1.1, d: 1.15, src: "/media/hardware-16.webp", t: "Processor cooling and temperature display" },
 ]
 
 const DISPLAY = "VgDisplay,'Instrument Serif','Iowan Old Style',Georgia,serif"
@@ -907,7 +907,7 @@ export default function VellumJournalTemplate({
               <img src={shown.src} alt={shown.t} />
             </button>
             <figcaption className="vg-sans">
-              <span>{"Plate " + String(box + 1).padStart(2, "0") + " / " + TILES.length}</span>
+              <span>{(shown.src.includes("/hardware-") || shown.src.endsWith("/detail-08.webp")) ? "Hardware example" : "Wildcat IT Solutions"} · {box + 1} / {TILES.length}</span>
               <i>{shown.t}</i>
             </figcaption>
           </figure>
