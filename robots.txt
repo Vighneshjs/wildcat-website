@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /template/
+Sitemap: https://wildcatdesk.shop/sitemap.xml
