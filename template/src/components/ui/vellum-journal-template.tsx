@@ -108,8 +108,8 @@ export type VellumJournalTemplateProps = {
   /** The cream page's headline; the flower sits between the two halves. */
   galleryTitle?: [string, string]
   galleryBody?: [string, string]
-  /** Words that slide past under the gallery headline. */
-  shelf?: string[]
+  /** Service names or links under the gallery headline. */
+  shelf?: readonly (string | { label: string; href: string })[]
   issue?: string
   year?: string
   primaryAction?: Action
@@ -815,7 +815,13 @@ export default function VellumJournalTemplate({
                 </div>
                 {cta(primaryAction, false)}
                 <ul className="vg-shelf" aria-label="Services">
-                  {shelf.map((item) => <li key={item}>{item}</li>)}
+                  {shelf.map((item) =>
+                    typeof item === "string" ? (
+                      <li key={item}>{item}</li>
+                    ) : (
+                      <li key={item.href}><a href={item.href}>{item.label}</a></li>
+                    ),
+                  )}
                 </ul>
               </div>
             </section>

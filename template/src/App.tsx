@@ -1,11 +1,6 @@
 import VellumJournalTemplate from "@/components/ui/vellum-journal-template"
 
-const contact = {
-  address: "Kummalloor–Meeyanoor Road, Meeyanoor, Kollam, Kerala 691537",
-  phones: ["+91 85478 75657", "+91 96332 52164"],
-  email: "wildcatitsolutions@gmail.com",
-  map: "https://www.google.com/maps?cid=10698942720885332175",
-}
+import { contact, serviceLinks, telHref } from "./business"
 
 export default function App() {
   return (
@@ -24,10 +19,10 @@ export default function App() {
           "Custom PC builds in Kollam, from everyday desktops to high-end gaming PCs. Call with your budget and what you want to run.",
           "Laptop repair and desktop PC servicing in Meeyanoor. Call to discuss the issue, upgrade options, and what to bring.",
         ]}
-        shelf={["Gaming PCs", "Laptop Repair", "PC Service", "Upgrades"]}
+        shelf={serviceLinks}
         issue="A custom gaming setup at Wildcat IT Solutions, Meeyanoor."
         year="2024"
-        primaryAction={{label: "Call the shop", href: "tel:+918547875657"}}
+        primaryAction={{label: "Call the shop", href: telHref(contact.phones[0])}}
         secondaryAction={{label: "Get directions", href: contact.map}}
         contact={contact}
       />
