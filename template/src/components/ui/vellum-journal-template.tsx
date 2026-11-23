@@ -66,11 +66,11 @@ export const swingPose = (sw: number) => ({
 })
 
 /** The orange squiggle: the intro draws its first half over time, the scroll draws the rest. */
-export const INTRO_MS = 2600
+export const INTRO_MS = 1500
 export const squiggle = (ms: number, hy: number) => Math.min(1, 0.5 * smooth(ms / INTRO_MS) + 0.5 * clamp01(hy))
 
 /** Where the menu jumps to, in pinned progress. Each lands on a held beat, not mid-motion. */
-export const JUMPS = { top: 0, about: 0.58, gallery: 1 } as const
+export const JUMPS = { top: 0, about: 0.58, gallery: 0.99 } as const
 
 export function mulberry32(seed: number) {
   let a = seed >>> 0
@@ -118,30 +118,29 @@ export type VellumJournalTemplateProps = {
   style?: CSSProperties
 }
 
-type Tile = { x: number; y: number; w: number; a: number; d: number; src: string; t: string; c?: string }
+type Tile = { a: number; d: number; src: string; t: string; c?: string }
 
 const FEATURE = "/media/wildcat-gaming-pc-kollam.webp"
 const TILES: Tile[] = [
-  { x: 7, y: 8, w: 9, a: 1.28, d: 0.8, src: "/media/detail-01.webp", t: "Red-lit gaming PC tower", c: "Gaming build" },
-  { x: 19.5, y: -4, w: 7, a: 0.9, d: 1.2, src: "/media/hardware-02.webp", t: "Precision tools used on a laptop board" },
-  { x: 27, y: 21, w: 7, a: 0.95, d: 0.55, src: "/media/hardware-03.webp", t: "Blue-lit desktop graphics card and cooling fans" },
-  { x: 50, y: 14, w: 7, a: 1.3, d: 0.9, src: "/media/detail-04.webp", t: "Wildcat emblem on the shop wall" },
-  { x: 60.5, y: -3, w: 7, a: 1.25, d: 1.1, src: "/media/hardware-05.webp", t: "Screwdriver servicing an open laptop motherboard" },
-  { x: 71, y: 20, w: 7, a: 0.85, d: 0.6, src: "/media/hardware-06.webp", t: "Desktop tower with illuminated fans and memory" },
-  { x: 83, y: -1, w: 9, a: 1.05, d: 1, src: "/media/hardware-07.webp", t: "White-lit gaming PC cooling hardware" },
-  { x: 95.5, y: 2, w: 5, a: 2.6, d: 1.3, src: "/media/detail-08.webp", t: "Hands inspecting a desktop circuit board" },
-  { x: 89, y: 32, w: 6.5, a: 1.2, d: 0.7, src: "/media/hardware-09.webp", t: "Hands working on the internals of a laptop" },
-  { x: 3, y: 54, w: 7, a: 0.95, d: 0.75, src: "/media/hardware-10.webp", t: "Dark desktop build with a graphics card and liquid cooler" },
-  { x: -1, y: 80, w: 4.5, a: 2.2, d: 1.2, src: "/media/hardware-11.webp", t: "Close-up of tools and a laptop circuit board" },
-  { x: 22, y: 93, w: 5.5, a: 0.9, d: 1, src: "/media/hardware-12.webp", t: "Memory modules inside a gaming PC" },
-  { x: 41, y: 82, w: 7, a: 1.2, d: 0.65, src: "/media/hardware-13.webp", t: "Graphics card and radiator in a desktop PC" },
-  { x: 60, y: 87, w: 7, a: 1.05, d: 0.95, src: "/media/hardware-14.webp", t: "Gaming computer with a liquid cooling loop" },
-  { x: 78, y: 74, w: 9, a: 1.3, d: 0.8, src: "/media/detail-15.webp", t: "Full desktop setup at Wildcat", c: "Meeyanoor" },
-  { x: 96, y: 68, w: 4.5, a: 1.1, d: 1.15, src: "/media/hardware-16.webp", t: "Processor cooling and temperature display" },
+  { a: 1.28, d: 0.8, src: "/media/detail-01.webp", t: "Red-lit gaming PC tower", c: "Gaming build" },
+  { a: 0.9, d: 1.2, src: "/media/hardware-02.webp", t: "Precision tools used on a laptop board" },
+  { a: 0.95, d: 0.55, src: "/media/hardware-03.webp", t: "Blue-lit desktop graphics card and cooling fans" },
+  { a: 1.3, d: 0.9, src: "/media/detail-04.webp", t: "Wildcat emblem on the shop wall" },
+  { a: 1.25, d: 1.1, src: "/media/hardware-05.webp", t: "Screwdriver servicing an open laptop motherboard" },
+  { a: 0.85, d: 0.6, src: "/media/hardware-06.webp", t: "Desktop tower with illuminated fans and memory" },
+  { a: 1.05, d: 1, src: "/media/hardware-07.webp", t: "White-lit gaming PC cooling hardware" },
+  { a: 2.6, d: 1.3, src: "/media/detail-08.webp", t: "Hands inspecting a desktop circuit board" },
+  { a: 1.2, d: 0.7, src: "/media/hardware-09.webp", t: "Hands working on the internals of a laptop" },
+  { a: 0.95, d: 0.75, src: "/media/hardware-10.webp", t: "Dark desktop build with a graphics card and liquid cooler" },
+  { a: 2.2, d: 1.2, src: "/media/hardware-11.webp", t: "Close-up of tools and a laptop circuit board" },
+  { a: 0.9, d: 1, src: "/media/hardware-12.webp", t: "Memory modules inside a gaming PC" },
+  { a: 1.2, d: 0.65, src: "/media/hardware-13.webp", t: "Graphics card and radiator in a desktop PC" },
+  { a: 1.05, d: 0.95, src: "/media/hardware-14.webp", t: "Gaming computer with a liquid cooling loop" },
+  { a: 1.3, d: 0.8, src: "/media/detail-15.webp", t: "Full desktop setup at Wildcat", c: "Meeyanoor" },
+  { a: 1.1, d: 1.15, src: "/media/hardware-16.webp", t: "Processor cooling and temperature display" },
 ]
 
 const DISPLAY = "'Barlow Condensed','Arial Narrow',sans-serif"
-const TEXT = DISPLAY
 const SANS = "'Source Sans 3',sans-serif"
 
 const CSS =
@@ -159,7 +158,7 @@ const CSS =
   ".vg-burger i{position:absolute;left:4px;right:4px;height:1px;background:currentColor;transition:transform .45s cubic-bezier(.6,0,.2,1),top .45s cubic-bezier(.6,0,.2,1)}" +
   ".vg-burger i:first-child{top:8px}.vg-burger i:last-child{top:13px}" +
   ".vg-root[data-menu] .vg-burger i:first-child{top:10.5px;transform:rotate(20deg)}.vg-root[data-menu] .vg-burger i:last-child{top:10.5px;transform:rotate(-20deg)}" +
-  ".vg-menu{position:fixed;left:0;right:0;top:0;z-index:39;background:#f6f1ea;color:#1b1916;padding:92px 6vw 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px 4vw;transform:translateY(calc(-100% - 60px));transition:transform .7s cubic-bezier(.7,0,.2,1);box-shadow:0 30px 60px -40px rgba(0,0,0,.4)}" +
+  ".vg-menu{position:fixed;left:0;right:0;top:0;z-index:39;background:#f6f1ea;color:#1b1916;padding:92px 6vw 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px 4vw;transform:translateY(calc(-100% - 60px));transition:transform .28s ease-out;box-shadow:0 30px 60px -40px rgba(0,0,0,.4)}" +
   ".vg-root[data-menu] .vg-menu{transform:none}" +
   ".vg-menu button{display:flex;align-items:baseline;gap:12px;text-align:left;font-family:" + DISPLAY + ";font-size:clamp(28px,3.4vw,46px);line-height:1}" +
   ".vg-menu button small{font-family:" + SANS + ";font-size:10px;letter-spacing:.14em;color:#8a847b}" +
@@ -171,28 +170,28 @@ const CSS =
   ".vg-layer{position:absolute;inset:0;container-type:size;overflow:hidden}" +
   /* hero */
   ".vg-hero{background:#f6f1ea}" +
-  ".vg-tile{position:absolute;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);width:calc(var(--w) * 1cqw);transform:translate3d(calc(var(--mx) * var(--d) * -26px),calc(var(--my) * var(--d) * -18px - var(--hy) * var(--d) * 46cqh),0);will-change:transform}" +
-  ".vg-tile-in{animation:vg-pop 1s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.45s + var(--k) * 60ms)}" +
-  ".vg-float{animation:vg-float calc(6s + var(--k) * .41s) ease-in-out infinite alternate}" +
-  ".vg-photo{display:block;width:100%;aspect-ratio:1/var(--a);background:var(--bg);overflow:hidden;transition:transform .6s cubic-bezier(.2,.8,.2,1)}" +
-  ".vg-photo img{display:block;width:100%;height:100%;max-width:none;object-fit:cover}" +
+  ".vg-photos{position:absolute;inset:max(68px,11cqh) clamp(18px,6cqw,100px) 7cqh;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:36cqh clamp(8px,2cqw,28px);align-items:center;justify-items:center}" +
+  ".vg-tile{position:relative;width:min(100%,16cqh,8rem);transform:translate3d(calc(var(--mx) * var(--d) * -5px),calc(var(--my) * var(--d) * -5px - var(--hy) * var(--d) * 38cqh),0)}" +
+  ".vg-tile-in{animation:vg-pop .65s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.18s + var(--k) * 32ms)}" +
+  ".vg-photo{display:block;width:100%;height:min(15cqh,112px);overflow:hidden;transition:transform .6s cubic-bezier(.2,.8,.2,1)}" +
+  ".vg-photo img{display:block;width:100%;height:100%;max-width:none;object-fit:contain}" +
   ".vg-tile button:hover .vg-photo,.vg-tile button:focus-visible .vg-photo{transform:scale(1.06)}" +
   ".vg-tile button{display:block;width:100%;outline-offset:4px}" +
-  ".vg-cap{display:flex;gap:12px;margin-top:10px;font-size:8px;white-space:nowrap}" +
+  ".vg-cap{position:absolute;top:100%;left:0;display:flex;gap:6px;margin-top:5px;font-size:8px;white-space:nowrap}" +
   ".vg-cap::before{content:'';width:10px;height:1px;background:currentColor;align-self:center}" +
   ".vg-h1wrap{position:absolute;left:0;right:0;top:34%;text-align:center;transform:translate3d(calc(var(--mx) * -6px),calc(var(--hy) * -16cqh),0)}" +
   ".vg-h1{margin:0;font-family:" + DISPLAY + ";font-weight:500;font-size:min(8.6cqw,15.5cqh);line-height:1.02;letter-spacing:-.01em;color:#1b1916}" +
-  ".vg-ln{display:block;transform-origin:50% 70%;animation:vg-flip 1.6s cubic-bezier(.2,.75,.15,1) both;animation-delay:calc(var(--l) * .14s + .05s)}" +
+  ".vg-ln{display:block;transform-origin:50% 70%;animation:vg-flip .95s cubic-bezier(.2,.75,.15,1) both;animation-delay:calc(var(--l) * .14s + .05s)}" +
   ".vg-tag{margin-top:2.4cqh;font-size:9px;display:flex;justify-content:center;gap:8px}" +
   ".vg-squig{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}" +
   ".vg-squig path{fill:none;stroke:#e2603a;stroke-width:1.6;stroke-linecap:round;vector-effect:non-scaling-stroke}" +
   /* about: the black page rises over the hero */
   ".vg-about{background:#0d0c0b;color:#f3efe8;transform:translate3d(0,calc((1 - var(--ab)) * 100cqh),0);will-change:transform}" +
   ".vg-alabel{position:absolute;left:21cqw;top:15cqh;font-size:9px;color:#c9c3b8}" +
-  ".vg-quote{position:absolute;left:5cqw;top:24cqh;font-family:" + TEXT + ";font-size:min(8cqw,13cqh);line-height:1}" +
+  ".vg-quote{position:absolute;left:5cqw;top:24cqh;font-family:" + DISPLAY + ";font-size:min(8cqw,13cqh);line-height:1}" +
   ".vg-side{position:absolute;left:4cqw;top:42cqh;font-size:8px;display:flex;gap:14px;color:#c9c3b8}" +
   ".vg-side::before{content:'';width:10px;height:1px;background:currentColor;align-self:center}" +
-  ".vg-h2{position:absolute;left:21cqw;right:4cqw;top:21cqh;margin:0;font-family:" + TEXT + ";font-weight:500;font-size:min(6.6cqw,12.5cqh);line-height:1.05;letter-spacing:-.012em}" +
+  ".vg-h2{position:absolute;left:21cqw;right:4cqw;top:21cqh;margin:0;font-family:" + DISPLAY + ";font-weight:500;font-size:min(6.6cqw,12.5cqh);line-height:1.05;letter-spacing:-.012em}" +
   ".vg-h2 .vg-w{display:inline-block;white-space:nowrap}" +
   ".vg-ch{display:inline-block;--a:clamp(0,calc((var(--rv) * (var(--n) + 8) - var(--i)) / 8),1);opacity:calc(.08 + var(--a) * .92);transform:translate3d(calc((1 - var(--a)) * .42em),0,0);filter:blur(calc((1 - var(--a)) * 6px))}" +
   ".vg-cols{position:absolute;left:21cqw;right:12cqw;top:56cqh;display:grid;grid-template-columns:repeat(2,minmax(0,22cqw));gap:4cqw;font-family:" + SANS + ";font-size:clamp(10px,.82cqw,13px);line-height:1.6;color:#a39d93;opacity:calc(var(--rv) * 1.4 - .4)}" +
@@ -200,7 +199,7 @@ const CSS =
   ".vg-wire{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}" +
   ".vg-wire path{fill:none;stroke:#f3efe8;stroke-width:1.3;stroke-linecap:round;vector-effect:non-scaling-stroke}" +
   /* gallery: the cream page tossed onto the black like a card */
-  ".vg-card{position:absolute;left:0;top:0;width:100cqw;height:calc(100cqh + 16cqh);background:#f6f1ea;color:#1b1916;overflow:hidden;transform-origin:50% 45%;transform:translate3d(calc((1 - var(--sw)) * 10cqw),calc((1 - var(--sw)) * 150cqh),0) rotate(calc((1 - var(--sw)) * -140deg)) scale(calc(.84 + var(--sw) * .16));box-shadow:0 40px 90px -30px rgba(0,0,0,calc((1 - var(--sw)) * .9));will-change:transform}" +
+  ".vg-card{position:absolute;left:0;top:0;width:100cqw;height:100cqh;background:#f6f1ea;color:#1b1916;overflow:hidden;transform-origin:50% 45%;transform:translate3d(calc((1 - var(--sw)) * 10cqw),calc((1 - var(--sw)) * 150cqh),0) rotate(calc((1 - var(--sw)) * -140deg)) scale(calc(.84 + var(--sw) * .16));box-shadow:0 40px 90px -30px rgba(0,0,0,calc((1 - var(--sw)) * .9));will-change:transform}" +
   ".vg-gh{position:absolute;left:3cqw;right:2cqw;top:11cqh;margin:0;display:flex;align-items:center;gap:.12em;font-family:" + DISPLAY + ";font-weight:500;font-size:min(15.2cqw,27cqh);line-height:1;letter-spacing:-.02em;white-space:nowrap}" +
   ".vg-gh>span:last-child{position:relative}" +
   ".vg-flower{display:inline-block;color:#e2603a;width:.78em;height:.78em;margin:0 .06em;flex:none;transform:rotate(calc(var(--st) * 90deg + var(--f) * 220deg));transition:color .6s}" +
@@ -209,21 +208,19 @@ const CSS =
   ".vg-flower button[data-spin]{animation:vg-spin .9s cubic-bezier(.3,1.4,.4,1)}" +
   ".vg-under{position:absolute;left:-4%;top:100%;width:104%;height:.16em;overflow:visible}" +
   ".vg-under path{fill:none;stroke:#1b1916;stroke-width:1.4;stroke-linecap:round;vector-effect:non-scaling-stroke}" +
-  ".vg-gcols{position:absolute;left:49cqw;right:6cqw;top:46cqh;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5cqw;font-family:" + SANS + ";font-size:clamp(10px,.82cqw,13px);line-height:1.6;color:#4a463f}" +
-  ".vg-shelf{position:absolute;left:49cqw;right:0;top:72cqh;display:flex;align-items:baseline;gap:5cqw;overflow:hidden;white-space:nowrap}" +
-  ".vg-shelf::before{content:'';flex:none;width:18px;height:1px;background:#1b1916;align-self:center}" +
-  ".vg-shelf-in{display:flex;gap:8cqw;font-family:" + DISPLAY + ";font-size:min(3.9cqw,8cqh);line-height:1.2;padding-left:15cqw;transform:translate3d(calc(var(--f) * -60cqw),0,0)}" +
-  ".vg-issue{position:absolute;left:3cqw;top:79cqh;width:min(26cqw,300px);font-family:" + SANS + ";font-size:clamp(10px,.8cqw,12px);line-height:1.6;color:#4a463f;margin:0}" +
-  ".vg-strip{position:absolute;left:2cqw;right:2cqw;top:100cqh;height:92cqh;overflow:hidden}" +
-  ".vg-strip img,.vg-feat img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 0}" +
-  ".vg-root .vg-cta{position:absolute;left:49cqw;top:60cqh;display:inline-flex;align-items:center;gap:12px;height:44px;padding:0 20px 0 22px;border-radius:999px;background:#1b1916;color:#f6f1ea;font-size:10px;transition:transform .6s cubic-bezier(.3,1.6,.5,1)}" +
+  ".vg-service-copy{position:absolute;left:49cqw;right:6cqw;top:46cqh;display:grid;justify-items:start;gap:clamp(12px,2.6cqh,24px)}" +
+  ".vg-gcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,4cqw,52px);font-family:" + SANS + ";font-size:clamp(13px,1cqw,17px);line-height:1.5;color:#4a463f}" +
+  ".vg-shelf{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;margin:0;padding:0;list-style:none;font-family:" + DISPLAY + ";font-size:clamp(16px,2.1cqw,28px);line-height:1.3}" +
+  ".vg-shelf::before{content:'';width:16px;height:1px;background:#1b1916}" +
+  ".vg-root .vg-cta{position:relative;display:inline-flex;align-items:center;gap:12px;height:44px;padding:0 20px 0 22px;border-radius:999px;background:#1b1916;color:#f6f1ea;font-size:10px;transition:transform .6s cubic-bezier(.3,1.6,.5,1)}" +
   ".vg-root .vg-cta span{display:inline-flex;gap:12px;transition:transform .6s cubic-bezier(.3,1.6,.5,1)}" +
   ".vg-root .vg-cta.vg-ghost{background:transparent;color:#1b1916;box-shadow:inset 0 0 0 1px #1b1916}" +
   /* after the pin: the feature plate and the colophon scroll normally */
   ".vg-flow{position:relative;z-index:1;container-type:inline-size;background:#f6f1ea}" +
-  ".vg-feat{position:relative;margin:calc(var(--H) * -.16) 2cqw 0;height:calc(var(--H) * .92);overflow:hidden;background:#174a5d}" +
-  ".vg-year{position:absolute;left:1.4cqw;bottom:3cqw;font-family:" + DISPLAY + ";font-size:min(5.2cqw,90px);line-height:.8;color:#f6f1ea;writing-mode:vertical-rl;transform:rotate(180deg) translate3d(0,calc((var(--f) - .5) * -14cqw),0)}" +
-  ".vg-fcap{position:absolute;right:2cqw;bottom:2cqw;font-size:9px;color:#f6f1ea;display:flex;gap:16px}" +
+  ".vg-feat{position:relative;width:min(calc(100% - 2 * clamp(16px,4vw,60px)),110svh,1280px);margin:0 auto}" +
+  ".vg-feat img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:contain}" +
+  ".vg-year{position:absolute;left:clamp(10px,2vw,24px);top:clamp(10px,2vw,24px);font-family:" + DISPLAY + ";font-size:clamp(22px,4vw,64px);line-height:1;color:#f6f1ea;writing-mode:vertical-rl;transform:rotate(180deg);text-shadow:0 1px 8px #200a06}" +
+  ".vg-fcap{font-size:clamp(11px,1.1vw,15px);color:#4a463f;display:flex;flex-wrap:wrap;justify-content:space-between;gap:5px 16px;padding-top:10px}" +
   ".vg-end{position:relative;padding:14cqw 3cqw 0;overflow:hidden}" +
   ".vg-end-title{margin:0 0 4cqw;max-width:14ch;font-family:" + DISPLAY + ";font-weight:500;font-size:clamp(40px,7cqw,120px);line-height:.98;letter-spacing:-.015em}" +
   ".vg-acts{display:flex;flex-wrap:wrap;gap:14px}" +
@@ -258,33 +255,26 @@ const CSS =
   "@media (hover:hover) and (pointer:fine){.vg-cursor{display:block}.vg-root[data-fine],.vg-root[data-fine] button,.vg-root[data-fine] a{cursor:none}}" +
   ".vg-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}" +
   /* golden hour (the easter egg) */
-  ".vg-root[data-gold] .vg-photo img,.vg-root[data-gold] .vg-feat img,.vg-root[data-gold] .vg-strip img{filter:sepia(.45) saturate(1.35) hue-rotate(-8deg) brightness(1.04)}" +
+  ".vg-root[data-gold] .vg-photo img,.vg-root[data-gold] .vg-feat img{filter:sepia(.45) saturate(1.35) hue-rotate(-8deg) brightness(1.04)}" +
   ".vg-root[data-gold] .vg-flower{color:#d9a420}" +
   ".vg-root[data-gold] .vg-hero,.vg-root[data-gold] .vg-card,.vg-root[data-gold] .vg-flow{background:#f6e9d3}" +
   ".vg-hero,.vg-card,.vg-flow{transition:background-color 1.2s}" +
   /* small screens: the tiles grow, columns stack */
-  "@container (max-width:700px){.vg-squig{left:-40cqw;width:260cqw;top:22cqh}.vg-tile{width:calc(var(--w) * 1.75cqw)}.vg-cap{display:none}.vg-h1{font-size:12cqw}.vg-h2{left:6cqw;font-size:9.6cqw;top:24cqh}.vg-alabel{left:6cqw;top:17cqh}.vg-quote,.vg-side{display:none}.vg-cols{left:6cqw;right:6cqw;grid-template-columns:1fr;gap:12px;top:52cqh}.vg-gh{flex-wrap:wrap;top:14cqh;font-size:16cqw;white-space:normal;gap:0 .2em;justify-content:flex-start}.vg-gcols{left:6cqw;right:6cqw;grid-template-columns:1fr;gap:10px;top:46cqh}.vg-shelf{left:6cqw;top:70cqh}.vg-shelf-in{font-size:9cqw}.vg-root .vg-cta{left:6cqw;top:62cqh}.vg-issue{width:auto;right:6cqw;left:6cqw;top:84cqh}}" +
+  "@container (max-width:700px){.vg-squig{left:-40cqw;width:260cqw;top:22cqh}.vg-cap{display:none}.vg-h1{font-size:12cqw}.vg-h2{left:6cqw;font-size:9.6cqw;top:24cqh}.vg-alabel{left:6cqw;top:17cqh}.vg-quote,.vg-side{display:none}.vg-cols{left:6cqw;right:6cqw;grid-template-columns:1fr;gap:12px;top:52cqh}.vg-gh{flex-wrap:wrap;top:14cqh;font-size:16cqw;white-space:normal;gap:0 .2em;justify-content:flex-start}.vg-service-copy{left:6cqw;right:6cqw;top:39cqh}.vg-gcols{grid-template-columns:1fr;gap:8px}}" +
   "@container (max-width:700px){.vg-meta{grid-template-columns:1fr}.vg-end{padding-top:22cqw}}" +
   "@keyframes vg-flip{0%{transform:perspective(900px) rotateX(168deg) translateY(12%);opacity:0}18%{opacity:.55}100%{transform:none;opacity:1}}" +
   "@keyframes vg-pop{from{opacity:0;transform:scale(.6) translateY(16px)}}" +
-  "@keyframes vg-float{to{transform:translate3d(calc(var(--fx) * 1px),calc(var(--fy) * 1px),0)}}" +
   "@keyframes vg-turn{to{transform:rotate(360deg)}}" +
   "@keyframes vg-spin{from{transform:rotate(-360deg) scale(.7)}}" +
   /* reduced motion: nothing flies; the chapters simply stack as pages */
-  "@media (prefers-reduced-motion:reduce){.vg-ln,.vg-tile-in,.vg-float,.vg-ring,.vg-flower button[data-spin]{animation:none}.vg-menu,.vg-box,.vg-box figure,.vg-toast,.vg-cta,.vg-cta span,.vg-burger,.vg-burger i,.vg-badge,.vg-cdot,.vg-photo{transition:none}}" +
+  "@media (prefers-reduced-motion:reduce){.vg-ln,.vg-tile-in,.vg-ring,.vg-flower button[data-spin]{animation:none}.vg-menu,.vg-box,.vg-box figure,.vg-toast,.vg-cta,.vg-cta span,.vg-burger,.vg-burger i,.vg-badge,.vg-cdot,.vg-photo{transition:none}}" +
   ".vg-root[data-still] .vg-track{height:auto!important}" +
   ".vg-root[data-still] .vg-stage{position:relative;height:auto!important;container-type:normal;overflow:visible}" +
   ".vg-root[data-still] .vg-layer{position:relative;height:var(--H);transform:none}" +
-  ".vg-root[data-still] .vg-card{position:relative;transform:none;box-shadow:none;height:calc(var(--H) * 1.16)}" +
+  ".vg-root[data-still] .vg-card{position:relative;transform:none;box-shadow:none;height:var(--H)}" +
   ".vg-root[data-still] .vg-cardwrap{position:relative;height:var(--H);overflow:visible;background:#0d0c0b}" +
-  ".vg-root[data-still] .vg-tile,.vg-root[data-still] .vg-h1wrap,.vg-root[data-still] .vg-shelf-in,.vg-root[data-still] .vg-year,.vg-root[data-still] .vg-flower,.vg-root[data-still] .vg-ch{transform:none}" +
+  ".vg-root[data-still] .vg-tile,.vg-root[data-still] .vg-h1wrap,.vg-root[data-still] .vg-flower,.vg-root[data-still] .vg-ch{transform:none}" +
   ".vg-root[data-still] .vg-ch{opacity:1;filter:none}.vg-root[data-still] .vg-cols{opacity:1}"
-
-/* --- fonts: SIL OFL 1.1 subsets, renamed as the licence asks of modified copies ---
-   VgDisplay = Instrument Serif (c) 2022 The Instrument Serif Project Authors
-   VgText    = Source Serif 4, wght 400 / opsz 60 instance (c) 2014 The Source Serif 4 Project Authors
-   VgSans    = DM Sans, wght 500 / opsz 14 instance (c) 2014 The DM Sans Project Authors */
-/* --- small pieces --- */
 
 const SQUIGGLE = "M200 360 C 150 330, 105 352, 118 378 C 132 404, 196 386, 232 350 C 262 320, 300 330, 296 372 C 292 420, 250 450, 268 488 C 284 522, 340 512, 352 548 C 360 572, 340 590, 360 610"
 const WIRE = "M-20 880 C 120 840, 220 900, 340 860 C 470 815, 520 760, 640 790 C 780 826, 820 700, 980 690 C 1080 684, 1120 720, 1040 760"
@@ -310,7 +300,7 @@ const ringText = (label: string) => {
 
 export default function VellumJournalTemplate({
   height = "100svh",
-  scrollLength = 4.6,
+  scrollLength = 2.9,
   brand = "Vellum",
   headline = ["Notice The Light", "Wherever It Falls"],
   tagline = "& frame it your own way",
@@ -460,13 +450,13 @@ export default function VellumJournalTemplate({
     const travel = st.trackH - st.stageH
     if (st.still && (to === "about" || to === "gallery")) {
       setMenu(false)
-      root.querySelector(to === "about" ? "#about" : "#services")?.scrollIntoView()
+      root.querySelector(to === "about" ? "#about" : "#services")?.scrollIntoView({ block: "start" })
       return
     }
     const y =
-      to === "feature" ? st.flowTop - (typeof window !== "undefined" ? window.innerHeight * 0.1 : 0) : to === "end" ? (root.querySelector("#contact") as HTMLElement).getBoundingClientRect().top - top : st.trackTop + JUMPS[to] * travel
+      to === "feature" ? (root.querySelector("#feature") as HTMLElement).getBoundingClientRect().top - top - 72 : to === "end" ? (root.querySelector("#contact") as HTMLElement).getBoundingClientRect().top - top : st.trackTop + JUMPS[to] * travel
     setMenu(false)
-    window.scrollBy({ top: top + y, behavior: st.still ? "auto" : "smooth" })
+    window.scrollBy({ top: top + y, behavior: "auto" })
   }, [])
 
   // the frame loop: eases toward the scroll and the pointer, then writes a few variables
@@ -485,7 +475,7 @@ export default function VellumJournalTemplate({
     const frame = (now: number) => {
       const dt = Math.min(64, now - last)
       last = now
-      const k = 1 - Math.exp(-dt / 90)
+      const k = 1 - Math.exp(-dt / 50)
       st.cur = st.still ? 1 : Math.abs(st.cur - st.target) < 1e-4 ? st.target : st.cur + (st.target - st.cur) * k
       st.fCur = st.still ? 0.5 : Math.abs(st.fCur - st.f) < 1e-4 ? st.f : st.fCur + (st.f - st.fCur) * k
       const km = 1 - Math.exp(-dt / 220)
@@ -497,7 +487,7 @@ export default function VellumJournalTemplate({
         st.intro = false
         if (h1) h1.style.filter = "none"
       }
-      if (st.intro && dispRef.current) dispRef.current.setAttribute("scale", (38 * (1 - smooth(age / 1500))).toFixed(2))
+      if (st.intro && dispRef.current) dispRef.current.setAttribute("scale", (38 * (1 - smooth(age / 850))).toFixed(2))
       const sq = st.still ? 1 : squiggle(age, b.hy)
       const key = [b.hy, b.ab, b.rv, b.wl, b.sw, b.st, st.mx, st.my, st.fCur, sq].map((v) => v.toFixed(4)).join()
       if (key !== st.written) {
@@ -734,24 +724,20 @@ export default function VellumJournalTemplate({
         <div className="vg-stage" style={{ height: H }}>
           {/* 1 · hero */}
           <section className="vg-layer vg-hero" aria-label="Cover" data-cursor="Scroll">
-            {TILES.map((t, k) => (
-              <div
-                key={k}
-                className="vg-tile"
-                style={{ "--x": t.x, "--y": t.y, "--w": t.w, "--d": t.d, "--k": k, "--a": t.a, "--fx": Math.round(Math.sin(k * 2.3) * 10), "--fy": Math.round(Math.cos(k * 1.7) * 9) } as CSSProperties}
-              >
-                <div className="vg-tile-in">
-                  <div className="vg-float">
-                    <button type="button" data-cursor="View photo" aria-label={"Open plate: " + t.t} onClick={() => setBox(k)}>
-                      <span className="vg-photo" style={{ "--bg": "#b18d79" } as CSSProperties}>
-                        <img src={t.src} alt="" width={320} height={Math.round(320 * t.a)} decoding="async" />
+            <div className="vg-photos">
+              {TILES.map((tile, index) => (
+                <div key={tile.src} className="vg-tile" style={{ "--d": tile.d, "--k": index } as CSSProperties}>
+                  <div className="vg-tile-in">
+                    <button type="button" data-cursor="View photo" aria-label={"Open plate: " + tile.t} onClick={() => setBox(index)}>
+                      <span className="vg-photo">
+                        <img src={tile.src} alt="" width={320} height={Math.round(320 * tile.a)} decoding="async" />
                       </span>
                     </button>
-                    {t.c ? <div className="vg-cap vg-sans">{t.c}</div> : null}
+                    {tile.c && <div className="vg-cap vg-sans">{tile.c}</div>}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
             <svg className="vg-squig" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
               <path ref={sqRef} d={SQUIGGLE} pathLength={1} strokeDasharray="1 2" strokeDashoffset={still ? 0 : 1} />
             </svg>
@@ -821,21 +807,15 @@ export default function VellumJournalTemplate({
                   </svg>
                 </span>
               </h2>
-              <div className="vg-gcols">
-                <p>{galleryBody[0]}</p>
-                <p>{galleryBody[1]}</p>
-              </div>
-              {cta(primaryAction, false)}
-              <div className="vg-shelf" aria-hidden="true">
-                <div className="vg-shelf-in">
-                  {shelf.map((w, i) => (
-                    <span key={i}>{w}</span>
-                  ))}
+              <div className="vg-service-copy">
+                <div className="vg-gcols">
+                  <p>{galleryBody[0]}</p>
+                  <p>{galleryBody[1]}</p>
                 </div>
-              </div>
-              <p className="vg-issue">{issue}</p>
-              <div className="vg-strip" aria-hidden="true">
-                <img src={FEATURE} alt="" width={1280} height={960} loading="lazy" decoding="async" />
+                {cta(primaryAction, false)}
+                <ul className="vg-shelf" aria-label="Services">
+                  {shelf.map((item) => <li key={item}>{item}</li>)}
+                </ul>
               </div>
             </section>
           </div>
@@ -844,13 +824,13 @@ export default function VellumJournalTemplate({
 
       {/* 4 · after the pin: the feature plate and the colophon */}
       <div ref={flowRef} className="vg-flow">
-        <figure className="vg-feat" style={{ margin: undefined }}>
+        <figure id="feature" className="vg-feat">
           <img src={FEATURE} alt="Red-lit custom gaming PC and desk at Wildcat IT Solutions in Meeyanoor, Kollam" width={1280} height={960} loading="lazy" decoding="async" />
           <span className="vg-year" aria-hidden="true">
             {year}
           </span>
           <figcaption className="vg-fcap vg-sans">
-            <span>Custom gaming PC</span>
+            <span>{issue}</span>
             <a href={contact.map}>See on Google Maps</a>
           </figcaption>
         </figure>
