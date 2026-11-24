@@ -100,3 +100,16 @@ p{max-width:54ch;color:var(--muted)}
 .visual.laptop-upgrade,.visual.board{grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:.5rem;padding-inline:3%}
 .visual.laptop-upgrade img,.visual.board img{width:100%;height:82%;object-fit:contain}
 .visual.laptop-upgrade img+img,.visual.board img+img{height:65%}
+
+.top{min-height:4.25rem}
+.hero{min-height:calc(100svh - 4.25rem)}
+.service-photo img{width:min(100%,26rem);height:86%;object-fit:cover;border-radius:.5rem}
+.visual img{filter:drop-shadow(0 14px 18px #0008)}
+@media(min-width:62rem) and (prefers-reduced-motion:no-preference){
+  .motion-ready .scroll-chapter{min-height:145svh;align-items:start}
+  .motion-ready .scroll-chapter .copy,.motion-ready .scroll-chapter .visual{position:sticky;top:clamp(6rem,20svh,13rem)}
+  .motion-ready .scroll-chapter .visual{height:clamp(20rem,55svh,38rem)}
+  .motion-ready .scroll-chapter .copy{padding-top:clamp(1rem,9svh,5rem)}
+}
+@keyframes service-enter{from{opacity:.25;transform:translateY(1.25rem)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:no-preference){.story.has-entered .copy{animation:service-enter .55s ease-out both}}

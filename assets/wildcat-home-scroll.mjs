@@ -3,7 +3,14 @@ const stages = [...document.querySelectorAll('[data-models]')];
 const scenes = new WeakMap();
 const loading = new WeakSet();
 const clamp = value => Math.max(0, Math.min(1, value));
-const scrollPose = (top, height, viewport) => clamp((viewport * .86 - top) / (viewport * .58 + height * .14));
+const sticky = matchMedia('(min-width: 62rem)');
+function scrollPose(stage, bounds) {
+  if (sticky.matches && stage.closest('.scroll-chapter')) {
+    const chapter = stage.closest('.scroll-chapter').getBoundingClientRect();
+    return clamp((innerHeight * .65 - chapter.top) / (chapter.height - innerHeight * .28));
+  }
+  return clamp((innerHeight * .86 - bounds.top) / (innerHeight * .58 + bounds.height * .14));
+}
 let frame;
 let libraries;
 let lastFrame = 0;
@@ -20,7 +27,7 @@ function update(time) {
     if (bounds.bottom <= 0 || bounds.top >= innerHeight) continue;
     const state = scenes.get(stage);
     if (!state) continue;
-    const target = scrollPose(bounds.top, bounds.height, height);
+    const target = scrollPose(stage, bounds);
     state.progress ??= target;
     state.progress += (target - state.progress) * blend;
     state.render(state.progress, blend);
@@ -37,20 +44,16 @@ async function prepare(stage) {
     const names = stage.dataset.models.split(' ');
     const isTower = names[0] === 'desktop';
     const isLaptop = names[0] === 'laptop-studio';
-    const isPair = names.length > 1;
-    const isBoard = names[0] === 'motherboard';
     const loader = new GLTFLoader();
     const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb' + (name === 'laptop-studio' ? '?v=2' : ''))));
     const scene = new T.Scene();
     const turns = [];
     let hinge;
-    models.forEach(({ scene: model }, index) => {
+    models.forEach(({ scene: model }) => {
       const bounds = new T.Box3().setFromObject(model);
       const pivot = new T.Group();
-      const size = isPair ? (index === 0 ? (isLaptop || isBoard ? 3.6 : 2.65) : (isLaptop || isBoard ? 1.45 : 1.95)) : 3.4;
-      pivot.scale.setScalar(size / bounds.getSize(new T.Vector3()).length());
+      pivot.scale.setScalar((isLaptop ? 4.1 : 3.4) / bounds.getSize(new T.Vector3()).length());
       model.position.sub(bounds.getCenter(new T.Vector3()));
-      if (isPair) pivot.position.set(index === 0 ? (isLaptop || isBoard ? -1.28 : -1.08) : (isLaptop || isBoard ? 1.65 : 1.22), index === 0 ? -.18 : .24, 0);
       pivot.add(model);
       scene.add(pivot);
       turns.push(pivot);
@@ -84,11 +87,11 @@ async function prepare(stage) {
     const renderer = new T.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
     renderer.toneMapping = T.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = isBoard ? .76 : .91;
+    renderer.toneMappingExposure = .91;
     const studio = new RoomEnvironment();
     const generator = new T.PMREMGenerator(renderer);
     scene.environment = generator.fromScene(studio, .08).texture;
-    scene.environmentIntensity = isBoard ? .55 : .85;
+    scene.environmentIntensity = .85;
     studio.dispose();
     generator.dispose();
     const canvas = renderer.domElement;
@@ -108,15 +111,15 @@ async function prepare(stage) {
       const eased = opening * opening * (3 - 2 * opening);
       const motionProgress = clamp((progress - .05) / .78);
       const sweep = motionProgress * motionProgress * (3 - 2 * motionProgress);
-      turns.forEach((pivot, index) => {
-        const facing = isLaptop && index === 0 ? -1.60 : index ? -.17 : .3;
-        const travel = isTower ? .48 : isLaptop ? .58 : isBoard ? .95 : .76;
+      turns.forEach(pivot => {
+        const facing = isLaptop ? -1.60 : .38;
+        const travel = isTower ? .55 : .88;
         pivot.rotation.y = facing + (.5 - sweep) * travel + smoothX * .55 + spin;
-        pivot.rotation.x = (isBoard ? -.30 : isPair ? -.19 : -.08) * (1 - sweep) + smoothY * .24;
+        pivot.rotation.x = -.08 * (1 - sweep) + smoothY * .24;
       });
-      if (hinge) hinge.rotation.y = -1.1 * eased;
-      camera.position.set(isTower ? 2.3 - eased * .64 : .7, isTower ? 1.4 - .28 * eased : isBoard ? 3.15 : isLaptop ? 1.85 : 2.45,
-        Math.max(isLaptop || isBoard ? 6.8 : 5.8, (isPair ? 7.25 : 5.6) / camera.aspect));
+      if (hinge) hinge.rotation.y = -1.45 * eased;
+      camera.position.set(isTower ? 2.3 - eased * .64 : .7, isTower ? 1.4 - .28 * eased : 1.85,
+        Math.max(5.8, 5.6 / camera.aspect));
       camera.lookAt(isTower ? -.18 * eased : 0, 0, 0);
       renderer.render(scene, camera);
     };
@@ -156,7 +159,7 @@ async function prepare(stage) {
     resize();
     const bounds = stage.getBoundingClientRect();
     const state = scenes.get(stage);
-    state.progress = scrollPose(bounds.top, bounds.height, innerHeight);
+    state.progress = scrollPose(stage, bounds);
     render(state.progress);
     stage.classList.toggle('is-live', !motion.matches);
     new ResizeObserver(resize).observe(stage);
@@ -165,6 +168,15 @@ async function prepare(stage) {
   }
 }
 
+document.documentElement.classList.add('motion-ready');
+const reveal = new IntersectionObserver(entries => {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    entry.target.closest('.story').classList.add('has-entered');
+    reveal.unobserve(entry.target);
+  }
+}, { threshold: .2 });
+for (const copy of document.querySelectorAll('.story .copy')) reveal.observe(copy);
 const observer = new IntersectionObserver(entries => {
   for (const entry of entries) if (entry.isIntersecting) prepare(entry.target);
 }, { rootMargin: '140px' });
