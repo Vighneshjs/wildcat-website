@@ -41,9 +41,11 @@ async function prepare(stage) {
     const names = stage.dataset.models.split(' ');
     const isTower = names[0] === 'desktop';
     const isLaptop = names[0] === 'laptop-studio';
+    const isKeyboard = names[0] === 'keyboard-finish';
+    const isHeadset = names[0] === 'headphones-finish';
     const isBoard = names[0] === 'service-board';
     const loader = new GLTFLoader();
-    const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb' + (name === 'laptop-studio' ? '?v=2' : ''))));
+    const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb' + (['laptop-studio', 'service-board'].includes(name) ? '?v=2' : ''))));
     const scene = new T.Scene();
     const turns = [];
     let hinge;
@@ -111,12 +113,12 @@ async function prepare(stage) {
       const sweep = motionProgress * motionProgress * (3 - 2 * motionProgress);
       turns.forEach(pivot => {
         const facing = isLaptop ? -1.60 : .38;
-        const travel = isTower ? .55 : .88;
+        const travel = isHeadset ? 1.65 : isTower ? .55 : .88;
         pivot.rotation.y = facing + (.5 - sweep) * travel + smoothX * .55 + spin;
         pivot.rotation.x = -.08 * (1 - sweep) + smoothY * .24;
       });
       if (hinge) hinge.rotation.y = -1.45 * eased;
-      camera.position.set(isTower ? 2.65 - eased * .65 : .65, isTower ? 1.4 - .28 * eased : isBoard ? 6.2 : 1.85,
+      camera.position.set(isTower ? 2.65 - eased * .65 : .65, isTower ? 1.4 - .28 * eased : isBoard || isKeyboard ? 5.6 : 1.85,
         Math.max(isTower ? 6.4 : 6.2, 6 / camera.aspect));
       camera.lookAt(isTower ? -.18 * eased : 0, 0, 0);
       renderer.render(scene, camera);
