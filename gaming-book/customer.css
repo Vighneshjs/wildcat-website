@@ -44,3 +44,4 @@ legend span{font-weight:400;color:var(--muted);margin-left:.25rem}
 #payment-note,.help{font-size:.95rem}
 @media(max-width:42rem){.layout{grid-template-columns:1fr}.summary{position:static}}
 @media(max-width:25rem){.fields{grid-template-columns:1fr;gap:.65rem}}
+.brand img{width:clamp(6rem,25vw,9.5rem);height:auto}
