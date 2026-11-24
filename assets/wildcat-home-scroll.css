@@ -105,17 +105,11 @@ p{max-width:54ch;color:var(--muted)}
 .hero{min-height:calc(100svh - 4.25rem)}
 .motherboard img{width:88%;height:88%;object-fit:contain}
 .visual img{filter:drop-shadow(0 14px 18px #0008)}
-@media(min-width:62rem) and (prefers-reduced-motion:no-preference){
-  .motion-ready .scroll-chapter{min-height:120svh;align-items:start}
-  .motion-ready .scroll-chapter .copy,.motion-ready .scroll-chapter .visual{position:sticky;top:clamp(5.5rem,15svh,10rem)}
-  .motion-ready .scroll-chapter .visual{height:clamp(20rem,55svh,38rem)}
-  .motion-ready .scroll-chapter .copy{padding-top:clamp(1rem,9svh,5rem)}
-}
 @keyframes service-enter{from{opacity:.25;transform:translateY(1.25rem)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:no-preference){.story.has-entered .copy{animation:service-enter .55s ease-out both}}
 @media(min-width:62rem) and (prefers-reduced-motion:no-preference){
  .motion-ready .scroll-chapter{min-height:76svh;align-items:center}
- .motion-ready .scroll-chapter .copy,.motion-ready .scroll-chapter .visual{position:static}
+ .motion-ready .scroll-chapter .visual{height:clamp(20rem,55svh,38rem)}
  .motion-ready .scroll-chapter .copy{padding-top:0}
 }
 @media(max-width:61.99rem){
