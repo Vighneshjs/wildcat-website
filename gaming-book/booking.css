@@ -1,0 +1,11 @@
+.local-page [hidden] { display: none; }
+.local-page form { display: grid; gap: 1rem; max-width: 34rem; }
+.local-page label { display: grid; gap: .35rem; }
+.local-page input, .local-page select, .local-page button { padding: .7rem; font: inherit; border-radius: .35rem; }
+.local-page input, .local-page select { color: #17212b; background: #fff; border: 1px solid #8994a2; }
+.local-page input[type=checkbox] { width: 1.25rem; height: 1.25rem; }
+.local-page button { color: #fff; background: #153d88; border: 1px solid #7697d2; cursor: pointer; }
+.local-page button:disabled { opacity: .65; cursor: default; }
+.local-page #status { overflow-wrap: anywhere; }
+.local-page #schedule li { margin-bottom: .65rem; }
+.local-page #schedule button { margin-left: .5rem; }

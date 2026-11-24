@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Gaming schedule | Wildcat</title>
+<link rel="stylesheet" href="/assets/index-Y5XlWWtQ.css"><link rel="stylesheet" href="../booking.css">
+<script type="module" src="../owner.mjs"></script></head>
+<body class="local-page"><header class="local-header"><a href="/">Wildcat IT Solutions</a></header>
+<main><div class="local-intro"><h1>Gaming schedule</h1></div>
+<section><form id="signin"><label>Owner access token <input name="token" type="password" required></label>
+<button>Open schedule</button></form><p id="status" role="status"></p></section>
+<div id="panel" class="booking-panel" hidden>
+<section><h2>Opening hours and rates</h2><form id="settings">
+<label>Opens (IST) <input name="opens" type="time" step="1800" required></label>
+<label>Closes (IST) <input name="closes" type="time" step="1800" required></label>
+<label>Stations <input name="stations" type="number" min="1" max="20" required></label>
+<label>Hourly rate (₹) <input name="rate" type="number" min="0" step=".02" required></label>
+<label><input name="online" type="checkbox">Accept online bookings</label><button>Save settings</button></form></section>
+<section><h2 id="session-title">Add an owner session</h2><form id="session">
+<label>Date <input name="date" type="date" required></label>
+<label>Start time (IST) <input name="time" type="time" step="1800" required></label>
+<label>Duration (minutes) <input name="minutes" type="number" min="30" max="180" step="30" value="60" required></label>
+<label>Station (optional) <input name="station" type="number" min="1" max="20"></label>
+<label>Name <input name="name" maxlength="80" required></label>
+<label>Mobile number (optional) <input name="phone" type="tel"></label>
+<button>Save session</button><button id="reset-session" type="button" hidden>Stop editing</button></form></section>
+<section><h2>Upcoming sessions and payment reviews</h2><ul id="schedule"></ul></section>
+</div></main></body></html>

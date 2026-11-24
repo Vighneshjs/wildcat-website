@@ -1,0 +1,8 @@
+name = "wildcat-booking"
+main = "worker.mjs"
+compatibility_date = "2026-11-24"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "wildcat-booking"
+database_id = "REPLACE_WITH_D1_ID"
