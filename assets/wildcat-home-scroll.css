@@ -137,3 +137,11 @@ p{max-width:54ch;color:var(--muted)}
 .shop-footer a:hover{text-decoration:underline;color:white}
 
 @media(max-width:42rem){.accessory-pair{grid-column:auto;grid-row:auto;height:clamp(11rem,50vw,16rem)}}
+.story.gaming-story{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+.cafe-art{display:grid;grid-template-columns:1.65fr 1fr;gap:.8rem;min-width:0}
+.cafe-art a{display:flex;flex-direction:column;background:#17171b;border:1px solid #333238;border-radius:.7rem;overflow:hidden;text-decoration:none}
+.cafe-art img{display:block;width:100%;height:clamp(10rem,16vw,17rem);object-fit:cover}
+.cafe-art span{display:block;padding:.8rem 1rem;font-weight:700}.cafe-art b{float:right;color:#ff858e}.cafe-art small{display:block;font-weight:400;color:var(--muted)}
+.cafe-art a:hover{border-color:#f1707c}
+@media(max-width:56rem){.story.gaming-story{grid-template-columns:1fr}.cafe-art{margin-top:1rem}}
+@media(max-width:30rem){.cafe-art{grid-template-columns:1fr}.cafe-art .cafe-pc{display:grid;grid-template-columns:6rem 1fr;align-items:center}.cafe-pc img{height:5rem}.cafe-feature img{height:auto}}
