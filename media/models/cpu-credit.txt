@@ -1,0 +1,4 @@
+CPU Processor by Grab3D, CC0 1.0 Universal.
+https://grab3d.com/models/electronics/cpu/
+https://creativecommons.org/publicdomain/zero/1.0/
+Wildcat web variant resizes the original embedded textures.

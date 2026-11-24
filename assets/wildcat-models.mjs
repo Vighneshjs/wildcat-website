@@ -189,11 +189,13 @@ for (const control of document.querySelectorAll('[data-model]')) {
   control.addEventListener('click', async () => {
     control.disabled = true;
     const stage = document.querySelector('#model-' + name);
+    stage.classList.add('is-loading');
     stage.querySelector('.stage-note').textContent = 'Loading 3D model…';
     const rotate = await openModel(stage, name);
+    stage.classList.remove('is-loading');
     control.disabled = false;
     if (!rotate) { control.textContent = '3D preview unavailable'; control.disabled = true; return; }
-    control.textContent = 'Turn ' + name;
+    control.textContent = 'Turn ' + (name === 'cpu' ? 'CPU' : name);
     control.onclick = rotate;
     control.removeAttribute('data-model');
   }, { once: true });
