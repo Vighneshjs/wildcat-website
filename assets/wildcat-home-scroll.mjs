@@ -177,11 +177,37 @@ const reveal = new IntersectionObserver(entries => {
   }
 }, { threshold: .2 });
 for (const copy of document.querySelectorAll('.story .copy')) reveal.observe(copy);
+// Keep model decoding and WebGL setup out of an active wheel or touch gesture.
+const nearby = new Set();
+let busy = false;
+let idleTimer;
+function queuePreparation() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(async () => {
+    if (busy || motion.matches) return;
+    const stage = [...nearby].find(item => !loading.has(item));
+    if (!stage) return;
+    busy = true;
+    try {
+      await prepare(stage);
+    } finally {
+      busy = false;
+      queuePreparation();
+    }
+  }, 180);
+}
 const observer = new IntersectionObserver(entries => {
-  for (const entry of entries) if (entry.isIntersecting) prepare(entry.target);
-}, { rootMargin: '500px' });
+  for (const entry of entries) {
+    if (entry.isIntersecting) nearby.add(entry.target);
+    else nearby.delete(entry.target);
+  }
+  queuePreparation();
+}, { rootMargin: '350px' });
 for (const stage of stages) observer.observe(stage);
-addEventListener('scroll', schedule, { passive: true });
+addEventListener('scroll', () => {
+  schedule();
+  queuePreparation();
+}, { passive: true });
 addEventListener('resize', schedule, { passive: true });
 motion.addEventListener('change', () => {
   for (const stage of stages) {
