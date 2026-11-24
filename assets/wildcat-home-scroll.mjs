@@ -38,7 +38,7 @@ async function prepare(stage) {
     const isTower = names[0] === 'desktop';
     const isLaptop = names[0] === 'laptop-studio';
     const isPair = names.length > 1;
-    const isCpu = names[0] === 'cpu-studio';
+    const isBoard = names[0] === 'motherboard';
     const loader = new GLTFLoader();
     const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb' + (name === 'laptop-studio' ? '?v=2' : ''))));
     const scene = new T.Scene();
@@ -47,10 +47,10 @@ async function prepare(stage) {
     models.forEach(({ scene: model }, index) => {
       const bounds = new T.Box3().setFromObject(model);
       const pivot = new T.Group();
-      const size = isPair ? (index === 0 ? 2.65 : 1.95) : (isLaptop ? 4.1 : 3.4);
+      const size = isPair ? (index === 0 ? (isLaptop || isBoard ? 3.6 : 2.65) : (isLaptop || isBoard ? 1.45 : 1.95)) : 3.4;
       pivot.scale.setScalar(size / bounds.getSize(new T.Vector3()).length());
       model.position.sub(bounds.getCenter(new T.Vector3()));
-      if (isPair) pivot.position.set(index === 0 ? -1.08 : 1.22, index === 0 ? -.18 : .24, 0);
+      if (isPair) pivot.position.set(index === 0 ? (isLaptop || isBoard ? -1.28 : -1.08) : (isLaptop || isBoard ? 1.65 : 1.22), index === 0 ? -.18 : .24, 0);
       pivot.add(model);
       scene.add(pivot);
       turns.push(pivot);
@@ -84,11 +84,11 @@ async function prepare(stage) {
     const renderer = new T.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
     renderer.toneMapping = T.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = isCpu ? .76 : .91;
+    renderer.toneMappingExposure = isBoard ? .76 : .91;
     const studio = new RoomEnvironment();
     const generator = new T.PMREMGenerator(renderer);
     scene.environment = generator.fromScene(studio, .08).texture;
-    scene.environmentIntensity = isCpu ? .55 : .85;
+    scene.environmentIntensity = isBoard ? .55 : .85;
     studio.dispose();
     generator.dispose();
     const canvas = renderer.domElement;
@@ -109,14 +109,14 @@ async function prepare(stage) {
       const motionProgress = clamp((progress - .05) / .78);
       const sweep = motionProgress * motionProgress * (3 - 2 * motionProgress);
       turns.forEach((pivot, index) => {
-        const facing = isLaptop ? -1.60 : index ? -.17 : .3;
-        const travel = isTower ? .48 : isLaptop ? .58 : isCpu ? .95 : .76;
+        const facing = isLaptop && index === 0 ? -1.60 : index ? -.17 : .3;
+        const travel = isTower ? .48 : isLaptop ? .58 : isBoard ? .95 : .76;
         pivot.rotation.y = facing + (.5 - sweep) * travel + smoothX * .55 + spin;
-        pivot.rotation.x = (isCpu ? -.30 : isPair ? -.19 : -.08) * (1 - sweep) + smoothY * .24;
+        pivot.rotation.x = (isBoard ? -.30 : isPair ? -.19 : -.08) * (1 - sweep) + smoothY * .24;
       });
       if (hinge) hinge.rotation.y = -1.1 * eased;
-      camera.position.set(isTower ? 2.3 - eased * .64 : .7, isTower ? 1.4 - .28 * eased : isCpu ? 3.15 : isLaptop ? 1.85 : 2.45,
-        Math.max(5.8, (isPair ? 6.2 : 5.6) / camera.aspect));
+      camera.position.set(isTower ? 2.3 - eased * .64 : .7, isTower ? 1.4 - .28 * eased : isBoard ? 3.15 : isLaptop ? 1.85 : 2.45,
+        Math.max(isLaptop || isBoard ? 6.8 : 5.8, (isPair ? 7.25 : 5.6) / camera.aspect));
       camera.lookAt(isTower ? -.18 * eased : 0, 0, 0);
       renderer.render(scene, camera);
     };

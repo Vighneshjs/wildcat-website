@@ -96,3 +96,7 @@ p{max-width:54ch;color:var(--muted)}
 @media(max-width:42rem){.top .wrap{flex-wrap:wrap;padding-block:.4rem}.top nav{gap:.35rem}.top nav .nav-cafe{padding-inline:.55rem;font-size:.88rem}}
 #laptop.story{padding-block:clamp(1.35rem,2.5vw,2.5rem)}
 .laptop img{width:90%;height:90%;filter:drop-shadow(0 14px 18px #0009)}
+
+.visual.laptop-upgrade,.visual.board{grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:.5rem;padding-inline:3%}
+.visual.laptop-upgrade img,.visual.board img{width:100%;height:82%;object-fit:contain}
+.visual.laptop-upgrade img+img,.visual.board img+img{height:65%}
