@@ -34,7 +34,7 @@ async function prepare(stage) {
     const isLaptop = names[0] === 'laptop-studio';
     const isPair = names.length > 1;
     const loader = new GLTFLoader();
-    const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb')));
+    const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb' + (name === 'laptop-studio' ? '?v=2' : ''))));
     const scene = new T.Scene();
     const turns = [];
     let hinge;
