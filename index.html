@@ -102,43 +102,42 @@
   ]
 }</script>
 
-<link rel="stylesheet" href="/assets/wildcat-home-scroll.css">
+<link rel="stylesheet" href="/assets/wildcat-home-scroll.css?v=2">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
-<script type="module" src="/assets/wildcat-home-scroll.mjs"></script>
+<script type="module" src="/assets/wildcat-home-scroll.mjs?v=2"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
   <a href="/" class="brand"><img src="/media/wildcat-wordmark.svg" alt="Wildcat IT Solutions" width="1330" height="420"></a>
-  <nav aria-label="Main navigation"><a class="secondary" href="#services">Services</a><a class="nav-cafe" href="/gaming-cafe-kollam/">Gaming café</a><a class="cta" href="tel:+918547875657">Call Wildcat</a></nav>
+  <nav aria-label="Main navigation"><a class="secondary" href="#services">Services</a><a class="nav-cafe" href="/gaming-cafe-kollam/">Gaming café</a><a class="cta call-wildcat" href="tel:+918547875657">Call Wildcat</a></nav>
 </div></header>
 <main id="main">
-  <section class="hero"><div class="wrap">
-    <h1>Computer repairs.<br>Custom PC builds.</h1>
+  <section id="services" class="hero"><div class="wrap">
+    <h1 id="service-heading">Find your service</h1>
     <p>Laptop and desktop repairs, SSD upgrades, accessories and gaming sessions in Meeyanoor, Kollam.</p>
-    <div class="actions"><a class="cta" href="#services">Explore our services</a><a class="secondary" href="/gaming-pay/#booking-request">Book your gaming slot now</a><a class="text-link directions" href="https://www.google.com/maps?cid=10698942720885332175">Get directions</a></div>
+    <nav class="service-nav" aria-label="Jump to a service"><a href="#inside">Custom PCs</a><a href="#laptop">Laptop repair</a><a href="#desktop">Desktop repair</a><a href="#gear">Accessories</a><a href="#gaming">Gaming café</a></nav><div class="actions"><a class="cta" href="/gaming-pay/#booking-request">Book your gaming slot now</a><a class="text-link directions" href="https://www.google.com/maps?cid=10698942720885332175">Get directions</a></div>
   </div></section>
-  <section id="services" class="services wrap" aria-labelledby="service-heading">
-    <h2 id="service-heading">Find your service</h2>
-    <nav class="service-nav" aria-label="Jump to a service"><a href="#inside">Custom PCs</a><a href="#laptop">Laptop repair</a><a href="#desktop">Desktop repair</a><a href="#gear">Accessories</a><a href="#gaming">Gaming café</a></nav>
+  <section class="services wrap" aria-labelledby="service-heading">
+
     <article id="inside" class="story">
-      <div class="copy"><h3>Custom gaming PCs</h3><p>Choose parts around the games you play, your screen resolution and your budget. Ask about a full build or a graphics, storage or cooling upgrade.</p></div>
-      <figure class="visual tower" data-tower aria-hidden="true"><img src="/media/wildcat-tower-hero.webp" width="920" height="860" alt="" loading="lazy" decoding="async"></figure>
+      <div class="copy"><h2>Custom gaming PCs</h2><p>Choose parts around the games you play, your screen resolution and your budget. Ask about a full build or a graphics, storage or cooling upgrade.</p><nav class="service-contact" aria-label="Contact Wildcat"><a href="tel:+918547875657">Call</a><a href="mailto:wildcatitsolutions@gmail.com">Email</a><a href="https://www.google.com/maps?cid=10698942720885332175">Directions</a></nav></div>
+      <figure class="visual tower" data-models="desktop" aria-hidden="true"><img src="/media/wildcat-tower-hero.webp" width="920" height="860" alt="" loading="lazy" decoding="async"></figure>
     </article>
     <article id="laptop" class="story reverse">
-      <div class="copy"><h3>Laptop repair and SSD upgrades</h3><p>Bring in a laptop that overheats, won’t charge or has a damaged screen. We can also make compatible older laptops feel quicker with an NVMe or SATA SSD.</p><a class="text-link" href="/laptop-repair-kollam/">Explore laptop repair and upgrades</a></div>
-      <figure class="visual laptop" data-drift aria-hidden="true"><img src="/media/models/laptop-poster.webp" alt="" loading="lazy" decoding="async"></figure>
+      <div class="copy"><h2>Laptop repair and SSD upgrades</h2><p>Bring in a laptop that overheats, won’t charge or has a damaged screen. We can also make compatible older laptops feel quicker with an NVMe or SATA SSD.</p><nav class="service-contact" aria-label="Contact Wildcat"><a href="tel:+918547875657">Call</a><a href="mailto:wildcatitsolutions@gmail.com">Email</a><a href="https://www.google.com/maps?cid=10698942720885332175">Directions</a></nav></div>
+      <figure class="visual laptop" data-models="laptop" aria-hidden="true"><img src="/media/models/laptop-poster.webp" alt="" loading="lazy" decoding="async"></figure>
     </article>
     <article id="desktop" class="story">
-      <div class="copy"><h3>Desktop repair</h3><p>Get help with boot failures, crashes, overheating and hardware faults. Tell us when the problem started and what changed beforehand.</p><a class="text-link" href="/computer-repair-kollam/">Explore desktop repairs</a></div>
-      <figure class="visual cpu" data-drift aria-hidden="true"><img src="/media/models/cpu-poster.webp" alt="" loading="lazy" decoding="async"></figure>
+      <div class="copy"><h2>Desktop repair</h2><p>Get help with boot failures, crashes, overheating and hardware faults. Tell us when the problem started and what changed beforehand.</p><nav class="service-contact" aria-label="Contact Wildcat"><a href="tel:+918547875657">Call</a><a href="mailto:wildcatitsolutions@gmail.com">Email</a><a href="https://www.google.com/maps?cid=10698942720885332175">Directions</a></nav></div>
+      <figure class="visual cpu" data-models="cpu" aria-hidden="true"><img src="/media/models/cpu-poster.webp" alt="" loading="lazy" decoding="async"></figure>
     </article>
     <article id="gear" class="story reverse">
-      <div class="copy"><h3>Computer accessories</h3><p>Shop for keyboards, mice and headphones for work or gaming. Call to check stock and compatibility with your setup.</p><a class="text-link" href="/gaming-pc-builds-kollam/#accessories">Explore computer accessories</a></div>
-      <figure class="visual peripherals" data-drift aria-hidden="true"><img src="/media/models/keyboard-poster.webp" alt="" loading="lazy" decoding="async"><img src="/media/models/headphones-poster.webp" alt="" loading="lazy" decoding="async"></figure>
+      <div class="copy"><h2>Computer accessories</h2><p>Shop for keyboards, mice and headphones for work or gaming. Call to check stock and compatibility with your setup.</p><nav class="service-contact" aria-label="Contact Wildcat"><a href="tel:+918547875657">Call</a><a href="mailto:wildcatitsolutions@gmail.com">Email</a><a href="https://www.google.com/maps?cid=10698942720885332175">Directions</a></nav></div>
+      <figure class="visual peripherals" data-models="keyboard-finish headphones-finish" aria-hidden="true"><img src="/media/models/keyboard-finish.webp" alt="" loading="lazy" decoding="async"><img src="/media/models/headphones-finish.webp" alt="" loading="lazy" decoding="async"></figure>
     </article>
     <article id="gaming" class="story gaming-story">
-      <div class="copy"><h3>Gaming café</h3><p>Ask about GTA VI on PS5, the PC game list and session availability. Call ahead if you need a specific game or platform.</p><a class="cta" href="/gaming-pay/#booking-request">Book your gaming slot now</a><a class="text-link cafe-link" href="/gaming-cafe-kollam/">Explore the gaming café</a></div>
+      <div class="copy"><h2>Gaming café</h2><p>Ask about GTA VI on PS5, the PC game list and session availability. Call ahead if you need a specific game or platform.</p><a class="cta" href="/gaming-pay/#booking-request">Book your gaming slot now</a><nav class="service-contact" aria-label="Contact Wildcat"><a href="tel:+918547875657">Call</a><a href="mailto:wildcatitsolutions@gmail.com">Email</a><a href="https://www.google.com/maps?cid=10698942720885332175">Directions</a></nav></div>
     </article>
   </section>
     <section class="policies wrap" aria-labelledby="policy-heading">
@@ -164,5 +163,5 @@
     </details>
   </section>
 </main>
-<footer class="footer"><div class="wrap"><div class="footer-brand"><img src="/media/wildcat-mark.png" alt="" width="60" height="60"><address>Wildcat IT Solutions<br>Kummalloor–Meeyanoor Road, Meeyanoor, Kollam 691537</address></div><nav aria-label="Contact"><a class="cta" href="tel:+918547875657">Call Wildcat</a><a class="secondary" href="https://www.google.com/maps?cid=10698942720885332175">Get directions</a><a href="mailto:wildcatitsolutions@gmail.com">Email us</a></nav></div></footer>
+<footer class="footer"><div class="wrap"><div class="footer-brand"><img src="/media/wildcat-mark.png" alt="" width="60" height="60"><address>Wildcat IT Solutions<br>Kummalloor–Meeyanoor Road, Meeyanoor, Kollam 691537</address></div><nav aria-label="Contact"><a class="cta call-wildcat" href="tel:+918547875657">Call Wildcat</a><a class="secondary" href="https://www.google.com/maps?cid=10698942720885332175">Get directions</a><a href="mailto:wildcatitsolutions@gmail.com">Email us</a></nav></div></footer>
 </body></html>

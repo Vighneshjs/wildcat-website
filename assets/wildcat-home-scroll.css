@@ -24,11 +24,11 @@ h1,h2,h3,p{margin:0}
 h1,h2,h3{font-family:Barlow,'Arial Narrow',sans-serif;line-height:1}
 h1{font-size:clamp(3.1rem,7.5vw,7rem)}
 h2{font-size:clamp(2.5rem,5.2vw,4.8rem)}
-h3{font-size:clamp(2.3rem,4.7vw,4.35rem)}
+.story h2{font-size:clamp(2.3rem,4.7vw,4.35rem)}
 p{max-width:54ch;color:var(--muted)}
-.hero{display:grid;align-items:center;min-height:min(39rem,76svh);padding-block:clamp(2rem,6vw,4.5rem);border-bottom:1px solid var(--line);background:linear-gradient(90deg,#0b0b0d,#151417)}
+.hero{display:grid;align-items:center;min-height:min(31rem,64svh);padding-block:clamp(2rem,6vw,4.5rem);border-bottom:1px solid var(--line);background:linear-gradient(90deg,#0b0b0d,#151417)}
 .hero p{margin:1rem 0 1.35rem}
-.services{padding-top:clamp(2.8rem,6vw,5rem)}
+.services{padding-top:1.25rem}
 .service-nav{margin:1.25rem 0 1.75rem;gap:.5rem 1.35rem;color:var(--muted)}
 .service-nav a:hover,.text-link:hover{color:#ff8d96}
 .story{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center;gap:clamp(1.25rem,5vw,4.5rem);padding-block:clamp(2rem,4vw,3.75rem);border-top:1px solid var(--line)}
@@ -41,8 +41,8 @@ p{max-width:54ch;color:var(--muted)}
 .visual img{width:70%;height:76%;object-fit:contain;filter:brightness(.86) contrast(1.12) drop-shadow(0 14px 18px #0009);transform:translateY(var(--drift,0px)) rotate(var(--angle,0deg));}
 .tower{height:clamp(17rem,36vw,32rem)}
 .tower img{width:100%;height:100%;filter:none}
-.tower canvas{position:absolute;inset:0;width:100%;height:100%}
-.tower.is-live img,.tower:not(.is-live) canvas{visibility:hidden}
+.visual canvas{position:absolute;inset:0;width:100%;height:100%}
+.visual.is-live img,.visual:not(.is-live) canvas{visibility:hidden}
 .cpu img{width:65%;height:68%}
 .peripherals{grid-template-columns:1.2fr .8fr;gap:1rem;padding:0 5%}
 .peripherals img{width:100%;height:70%}
@@ -74,3 +74,11 @@ p{max-width:54ch;color:var(--muted)}
 .footer-brand img{width:3rem;height:3rem;object-fit:contain;border-radius:.4rem}
 .cafe-link{display:inline-block;margin:.5rem 0 .5rem 1rem}
 @media(max-width:25rem){.wrap{width:calc(100% - 1.5rem)}.top .wrap,.top nav{gap:.35rem}.top .secondary,.top .cta{padding-inline:.45rem}.cafe-link{margin-left:0;display:block}}
+
+.service-nav a,.service-contact a{padding:.4rem .65rem;border:1px solid var(--line);border-radius:.25rem;text-decoration:none;color:var(--ink)}
+.service-nav a:hover,.service-contact a:hover{border-color:#ff929a;color:#ff929a}
+.service-contact{gap:.45rem;margin-top:.9rem;font-size:.98rem}
+.call-wildcat{gap:.5rem;font-weight:600;white-space:nowrap}
+.call-wildcat::before{content:'';width:.95rem;height:1.15rem;flex:none;background:#fff;mask:url('/media/wildcat-call-mark.svg') center/contain no-repeat}
+.visual.is-live{pointer-events:auto;touch-action:pan-y}
+@media(pointer:fine){.visual.is-live{cursor:grab}.visual.is-live:active{cursor:grabbing}}
