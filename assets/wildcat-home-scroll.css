@@ -139,3 +139,6 @@ p{max-width:54ch;color:var(--muted)}
 .cafe-art a:hover{border-color:#f1707c}
 @media(max-width:56rem){.story.gaming-story{grid-template-columns:1fr}.cafe-art{margin-top:1rem}}
 @media(max-width:30rem){.cafe-art{grid-template-columns:1fr}.cafe-art .cafe-pc{display:grid;grid-template-columns:6rem 1fr;align-items:center}.cafe-pc img{height:5rem}.cafe-feature img{height:auto}}
+
+/* Give the loading frame and the live canvas the same containing box. */
+.visual[data-models] > img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform:none;filter:none}
