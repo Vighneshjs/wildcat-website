@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080808">
+  <title>Book a gaming session | Wildcat IT Solutions</title>
+  <link rel="icon" href="/media/wildcat-icon.png">
+  <link rel="stylesheet" href="./customer.css">
+  <script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script type="module" src="./booking.mjs"></script>
+</head>
+<body>
+  <header class="site-header"><div class="shell"><a class="brand" href="/"><img src="/media/wildcat-icon.png" alt="" width="32" height="32">Wildcat IT Solutions</a><a href="/gaming-cafe-kollam/">Gaming café</a></div></header>
+  <main class="shell">
+    <div class="intro">
+      <p>Gaming café · Meeyanoor, Kollam</p>
+      <h1>Book a gaming session</h1>
+      <p>Choose a time and reserve one gaming station.</p>
+    </div>
+    <div class="layout">
+      <form id="booking">
+        <section class="card" aria-labelledby="slot-heading">
+          <h2 id="slot-heading">Choose your time</h2>
+          <div class="fields">
+            <label>Date <input name="date" type="date" required></label>
+            <label>Duration <select name="minutes"><option value="30">30 minutes</option><option value="60" selected>1 hour</option><option value="90">1 hour 30 minutes</option><option value="120">2 hours</option><option value="150">2 hours 30 minutes</option><option value="180">3 hours</option></select></label>
+          </div>
+          <fieldset><legend>Start time <span>IST</span></legend>
+            <p id="availability" role="status">Checking available times…</p>
+            <div id="times" class="times"></div>
+          </fieldset>
+        </section>
+        <section class="card" aria-labelledby="details-heading">
+          <h2 id="details-heading">Your details</h2>
+          <div class="fields">
+            <label>Name <input name="name" autocomplete="name" minlength="2" maxlength="80" required></label>
+            <label>Mobile number <input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" required></label>
+          </div>
+        </section>
+      </form>
+      <aside class="card summary" aria-labelledby="summary-heading">
+        <h2 id="summary-heading">Your session</h2>
+        <p id="selection">Choose a start time</p>
+        <div class="total"><span>Total</span><strong id="amount">—</strong></div>
+        <button type="submit" form="booking" id="pay" disabled>Continue to payment</button>
+        <p id="payment-note">Secure checkout with Razorpay</p>
+        <p id="status" role="status"></p>
+        <div id="confirmation" hidden>
+          <h3>Booking confirmed</h3>
+          <p id="confirmed-slot"></p>
+          <p>Booking reference <strong id="reference"></strong></p>
+          <button type="button" id="copy">Copy reference</button>
+        </div>
+        <p class="help"><a href="/gaming-pay/#booking-request">Request a slot on WhatsApp</a> · <a href="tel:+918547875657">Call the gaming café</a></p>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>
