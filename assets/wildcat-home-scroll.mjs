@@ -100,6 +100,9 @@ async function prepare(stage) {
     let tiltY = 0;
     let spin = 0;
     let dragX;
+    let dragId;
+    let dragY;
+    let pitch = 0;
 
     let smoothX = 0;
     let smoothY = 0;
@@ -115,7 +118,7 @@ async function prepare(stage) {
         const facing = isLaptop ? -1.60 : .38;
         const travel = isHeadset ? 1.65 : isTower ? .55 : .88;
         pivot.rotation.y = facing + (.5 - sweep) * travel + smoothX * .55 + spin;
-        pivot.rotation.x = -.08 * (1 - sweep) + smoothY * .24;
+        pivot.rotation.x = -.08 * (1 - sweep) + smoothY * .24 + pitch;
       });
       if (hinge) hinge.rotation.y = -1.45 * eased;
       camera.position.set(isTower ? 2.65 - eased * .65 : .65, isTower ? 1.4 - .28 * eased : isBoard || isKeyboard ? 5.6 : 1.85,
@@ -123,45 +126,48 @@ async function prepare(stage) {
       camera.lookAt(isTower ? -.18 * eased : 0, 0, 0);
       renderer.render(scene, camera);
     };
+    const state = { render, progress: scrollPose(stage, stage.getBoundingClientRect()) };
+    let width, height;
     const resize = () => {
       const { clientWidth, clientHeight } = stage;
-      if (!clientWidth || !clientHeight) return;
-      camera.aspect = clientWidth / clientHeight;
+      if (!clientWidth || !clientHeight || (width === clientWidth && height === clientHeight)) return;
+      width = clientWidth;
+      height = clientHeight;
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      renderer.setSize(clientWidth, clientHeight, false);
-      schedule();
+      renderer.setSize(width, height, false);
+      render(state.progress);
+      stage.classList.toggle('is-live', !motion.matches);
     };
     canvas.addEventListener('webglcontextlost', () => {
       scenes.delete(stage);
       stage.classList.remove('is-live');
     });
     stage.addEventListener('pointerdown', event => {
-      if (motion.matches || event.pointerType !== 'mouse' || event.button !== 0) return;
-      event.preventDefault();
+      if (motion.matches || !event.isPrimary || event.button !== 0) return;
+      dragId = event.pointerId;
+      dragY = event.clientY;
       dragX = event.clientX;
       stage.setPointerCapture(event.pointerId);
     });
     stage.addEventListener('pointermove', event => {
-      if (motion.matches || event.pointerType !== 'mouse') return;
-      if (dragX !== undefined) {
+      if (motion.matches || !event.isPrimary) return;
+      if (event.pointerId === dragId) {
+        pitch = Math.max(-.65, Math.min(.65, pitch + (event.clientY - dragY) * .008));
+        dragY = event.clientY;
         spin += (event.clientX - dragX) * .012;
         dragX = event.clientX;
-      } else {
+      } else if (event.pointerType === 'mouse') {
         const bounds = stage.getBoundingClientRect();
         tiltX = (event.clientX - bounds.left) / bounds.width - .5;
         tiltY = (event.clientY - bounds.top) / bounds.height - .5;
       }
       schedule();
     });
-    stage.addEventListener('lostpointercapture', () => { dragX = undefined; });
+    stage.addEventListener('lostpointercapture', () => { dragId = undefined; });
     stage.addEventListener('pointerleave', () => { tiltX = tiltY = 0; schedule(); });
-    scenes.set(stage, { render });
+    scenes.set(stage, state);
     resize();
-    const bounds = stage.getBoundingClientRect();
-    const state = scenes.get(stage);
-    state.progress = scrollPose(stage, bounds);
-    render(state.progress);
-    stage.classList.toggle('is-live', !motion.matches);
     new ResizeObserver(resize).observe(stage);
   } catch {
     // A rendered product image remains visible if WebGL or a model is unavailable.
@@ -182,10 +188,15 @@ const nearby = new Set();
 let busy = false;
 let idleTimer;
 function queuePreparation() {
-  clearTimeout(idleTimer);
+  if (idleTimer || busy) return;
   idleTimer = setTimeout(async () => {
-    if (busy || motion.matches) return;
-    const stage = [...nearby].find(item => !loading.has(item));
+    idleTimer = undefined;
+    if (motion.matches) return;
+    const candidates = [...nearby].filter(item => !loading.has(item));
+    const stage = candidates.find(item => {
+      const bounds = item.getBoundingClientRect();
+      return bounds.top < innerHeight && bounds.bottom > 0;
+    }) || candidates[0];
     if (!stage) return;
     busy = true;
     try {
@@ -194,7 +205,7 @@ function queuePreparation() {
       busy = false;
       queuePreparation();
     }
-  }, 180);
+  }, 16);
 }
 const observer = new IntersectionObserver(entries => {
   for (const entry of entries) {
@@ -206,7 +217,6 @@ const observer = new IntersectionObserver(entries => {
 for (const stage of stages) observer.observe(stage);
 addEventListener('scroll', () => {
   schedule();
-  queuePreparation();
 }, { passive: true });
 addEventListener('resize', schedule, { passive: true });
 motion.addEventListener('change', () => {
