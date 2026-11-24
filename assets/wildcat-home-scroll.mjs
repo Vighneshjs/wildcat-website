@@ -3,23 +3,28 @@ const stages = [...document.querySelectorAll('[data-models]')];
 const scenes = new WeakMap();
 const loading = new WeakSet();
 const clamp = value => Math.max(0, Math.min(1, value));
+const scrollPose = (top, height, viewport) => clamp((viewport * .86 - top) / (viewport * .58 + height * .14));
 let frame;
 let libraries;
+let lastFrame = 0;
 
 function schedule() {
   frame ??= requestAnimationFrame(update);
 }
 
-function update() {
+function update(time) {
   frame = undefined;
   if (motion.matches) return;
   for (const stage of stages) {
     const bounds = stage.getBoundingClientRect();
     if (bounds.bottom <= 0 || bounds.top >= innerHeight) continue;
-    const progress = clamp((innerHeight - bounds.top) / (innerHeight + bounds.height * .6));
-    stage.style.setProperty('--drift', (progress - .5) * -24 + 'px');
-    stage.style.setProperty('--angle', (progress - .5) * 4 + 'deg');
-    scenes.get(stage)?.render(progress);
+    const state = scenes.get(stage);
+    if (!state) continue;
+    const target = scrollPose(bounds.top, bounds.height, height);
+    state.progress ??= target;
+    state.progress += (target - state.progress) * blend;
+    state.render(state.progress, blend);
+    if (Math.abs(target - state.progress) > .001) schedule();
   }
 }
 
@@ -27,8 +32,8 @@ async function prepare(stage) {
   if (loading.has(stage) || motion.matches) return;
   loading.add(stage);
   try {
-    libraries ??= Promise.all([import('three'), import('three/addons/loaders/GLTFLoader.js')]);
-    const [T, { GLTFLoader }] = await libraries;
+    libraries ??= Promise.all([import('three'), import('three/addons/loaders/GLTFLoader.js'), import('three/addons/environments/RoomEnvironment.js')]);
+    const [T, { GLTFLoader }, { RoomEnvironment }] = await libraries;
     const names = stage.dataset.models.split(' ');
     const isTower = names[0] === 'desktop';
     const isLaptop = names[0] === 'laptop-studio';
@@ -71,15 +76,21 @@ async function prepare(stage) {
       source.position.set(...position);
       scene.add(source);
     };
-    scene.add(new T.HemisphereLight(0xfff6ef, 0x665c6f, 1.5));
-    light(0xfff6f0, 2.55, [3, 5, 4]);
-    light(0xff425d, 1.35, [-3, 2, -2]);
-    light(0xdce7ff, 1.8, [-3, 4, 6]);
+    scene.add(new T.HemisphereLight(0xffffff, 0x3e3b43, .65));
+    light(0xfff8f0, 1.15, [3, 5, 4]);
+    light(0xff929e, .7, [-3, 2, -2]);
+    light(0xe8efff, .55, [-3, 4, 6]);
 
     const renderer = new T.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
     renderer.toneMapping = T.ACESFilmicToneMapping;
     renderer.toneMappingExposure = isCpu ? .76 : .91;
+    const studio = new RoomEnvironment();
+    const generator = new T.PMREMGenerator(renderer);
+    scene.environment = generator.fromScene(studio, .08).texture;
+    scene.environmentIntensity = isCpu ? .55 : .85;
+    studio.dispose();
+    generator.dispose();
     const canvas = renderer.domElement;
     stage.prepend(canvas);
     let tiltX = 0;
@@ -87,7 +98,12 @@ async function prepare(stage) {
     let spin = 0;
     let dragX;
 
-    const render = progress => {
+    let smoothX = 0;
+    let smoothY = 0;
+    const render = (progress, blend = 1) => {
+      smoothX += (tiltX - smoothX) * blend;
+      smoothY += (tiltY - smoothY) * blend;
+      if (Math.abs(tiltX - smoothX) + Math.abs(tiltY - smoothY) > .003) schedule();
       const opening = clamp((progress - .19) / .53);
       const eased = opening * opening * (3 - 2 * opening);
       const motionProgress = clamp((progress - .05) / .78);
@@ -95,8 +111,8 @@ async function prepare(stage) {
       turns.forEach((pivot, index) => {
         const facing = isLaptop ? -1.60 : index ? -.17 : .3;
         const travel = isTower ? .48 : isLaptop ? .58 : isCpu ? .95 : .76;
-        pivot.rotation.y = facing + (.5 - sweep) * travel + tiltX * .55 + spin;
-        pivot.rotation.x = (isCpu ? -.30 : isPair ? -.19 : -.08) * (1 - sweep) + tiltY * .24;
+        pivot.rotation.y = facing + (.5 - sweep) * travel + smoothX * .55 + spin;
+        pivot.rotation.x = (isCpu ? -.30 : isPair ? -.19 : -.08) * (1 - sweep) + smoothY * .24;
       });
       if (hinge) hinge.rotation.y = -1.1 * eased;
       camera.position.set(isTower ? 2.3 - eased * .64 : .7, isTower ? 1.4 - .28 * eased : isCpu ? 3.15 : isLaptop ? 1.85 : 2.45,
@@ -138,7 +154,10 @@ async function prepare(stage) {
     stage.addEventListener('pointerleave', () => { tiltX = tiltY = 0; schedule(); });
     scenes.set(stage, { render });
     resize();
-    render(.5);
+    const bounds = stage.getBoundingClientRect();
+    const state = scenes.get(stage);
+    state.progress = scrollPose(bounds.top, bounds.height, innerHeight);
+    render(state.progress);
     stage.classList.toggle('is-live', !motion.matches);
     new ResizeObserver(resize).observe(stage);
   } catch {
