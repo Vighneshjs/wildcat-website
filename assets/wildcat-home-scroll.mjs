@@ -33,6 +33,7 @@ async function prepare(stage) {
     const isTower = names[0] === 'desktop';
     const isLaptop = names[0] === 'laptop-studio';
     const isPair = names.length > 1;
+    const isCpu = names[0] === 'cpu-studio';
     const loader = new GLTFLoader();
     const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb' + (name === 'laptop-studio' ? '?v=2' : ''))));
     const scene = new T.Scene();
@@ -78,7 +79,7 @@ async function prepare(stage) {
     const renderer = new T.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
     renderer.toneMapping = T.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = .95;
+    renderer.toneMappingExposure = isCpu ? .76 : .91;
     const canvas = renderer.domElement;
     stage.prepend(canvas);
     let tiltX = 0;
@@ -89,12 +90,16 @@ async function prepare(stage) {
     const render = progress => {
       const opening = clamp((progress - .19) / .53);
       const eased = opening * opening * (3 - 2 * opening);
+      const motionProgress = clamp((progress - .05) / .78);
+      const sweep = motionProgress * motionProgress * (3 - 2 * motionProgress);
       turns.forEach((pivot, index) => {
-        pivot.rotation.y = (isLaptop ? -1.38 : index ? -.17 : .3) - (isLaptop ? .28 : .48) * progress + tiltX * .34 + spin;
-        pivot.rotation.x = tiltY * .18;
+        const facing = isLaptop ? -1.60 : index ? -.17 : .3;
+        const travel = isTower ? .48 : isLaptop ? .58 : isCpu ? .95 : .76;
+        pivot.rotation.y = facing + (.5 - sweep) * travel + tiltX * .55 + spin;
+        pivot.rotation.x = (isCpu ? -.30 : isPair ? -.19 : -.08) * (1 - sweep) + tiltY * .24;
       });
       if (hinge) hinge.rotation.y = -1.1 * eased;
-      camera.position.set(isTower ? 2.3 - eased * .64 : .7, isTower ? 1.4 - .28 * eased : 2.45,
+      camera.position.set(isTower ? 2.3 - eased * .64 : .7, isTower ? 1.4 - .28 * eased : isCpu ? 3.15 : isLaptop ? 1.85 : 2.45,
         Math.max(5.8, (isPair ? 6.2 : 5.6) / camera.aspect));
       camera.lookAt(isTower ? -.18 * eased : 0, 0, 0);
       renderer.render(scene, camera);
