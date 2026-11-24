@@ -7,7 +7,7 @@ const sticky = matchMedia('(min-width: 62rem)');
 function scrollPose(stage, bounds) {
   if (sticky.matches && stage.closest('.scroll-chapter')) {
     const chapter = stage.closest('.scroll-chapter').getBoundingClientRect();
-    return clamp((innerHeight * .65 - chapter.top) / (chapter.height - innerHeight * .28));
+    return clamp((innerHeight * .74 - chapter.top) / Math.max(1, chapter.height - innerHeight * .42));
   }
   return clamp((innerHeight * .86 - bounds.top) / (innerHeight * .58 + bounds.height * .14));
 }
@@ -22,6 +22,8 @@ function schedule() {
 function update(time) {
   frame = undefined;
   if (motion.matches) return;
+  const blend = 1 - Math.exp(-Math.min(48, time - lastFrame) / 85);
+  lastFrame = time;
   for (const stage of stages) {
     const bounds = stage.getBoundingClientRect();
     if (bounds.bottom <= 0 || bounds.top >= innerHeight) continue;
@@ -44,6 +46,7 @@ async function prepare(stage) {
     const names = stage.dataset.models.split(' ');
     const isTower = names[0] === 'desktop';
     const isLaptop = names[0] === 'laptop-studio';
+    const isBoard = names[0] === 'motherboard';
     const loader = new GLTFLoader();
     const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb' + (name === 'laptop-studio' ? '?v=2' : ''))));
     const scene = new T.Scene();
@@ -52,7 +55,7 @@ async function prepare(stage) {
     models.forEach(({ scene: model }) => {
       const bounds = new T.Box3().setFromObject(model);
       const pivot = new T.Group();
-      pivot.scale.setScalar((isLaptop ? 4.1 : 3.4) / bounds.getSize(new T.Vector3()).length());
+      pivot.scale.setScalar((isLaptop || isBoard ? 4.1 : 3.4) / bounds.getSize(new T.Vector3()).length());
       model.position.sub(bounds.getCenter(new T.Vector3()));
       pivot.add(model);
       scene.add(pivot);
@@ -91,7 +94,7 @@ async function prepare(stage) {
     const studio = new RoomEnvironment();
     const generator = new T.PMREMGenerator(renderer);
     scene.environment = generator.fromScene(studio, .08).texture;
-    scene.environmentIntensity = .85;
+    scene.environmentIntensity = isBoard ? .6 : .85;
     studio.dispose();
     generator.dispose();
     const canvas = renderer.domElement;
@@ -118,8 +121,8 @@ async function prepare(stage) {
         pivot.rotation.x = -.08 * (1 - sweep) + smoothY * .24;
       });
       if (hinge) hinge.rotation.y = -1.45 * eased;
-      camera.position.set(isTower ? 2.3 - eased * .64 : .7, isTower ? 1.4 - .28 * eased : 1.85,
-        Math.max(5.8, 5.6 / camera.aspect));
+      camera.position.set(isTower ? 2.65 - eased * .65 : .65, isTower ? 1.4 - .28 * eased : isBoard ? 6.2 : 1.85,
+        Math.max(isTower ? 6.4 : 6.2, 6 / camera.aspect));
       camera.lookAt(isTower ? -.18 * eased : 0, 0, 0);
       renderer.render(scene, camera);
     };
