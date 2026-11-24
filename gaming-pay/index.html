@@ -8,7 +8,8 @@
   <link rel="canonical" href="https://wildcatdesk.shop/gaming-pay/">
   <link rel="icon" href="/media/wildcat-icon.png" type="image/png">
   <link rel="stylesheet" href="/assets/index-Y5XlWWtQ.css">
-  <title>Gaming prices and payment | Wildcat IT Solutions</title>
+  <title>Gaming prices and booking | Wildcat IT Solutions</title>
+  <script src="/gaming-pay/booking.js" defer></script>
   <script src="/gaming-pay/payment.js" defer></script>
 </head>
 <body class="local-page">
@@ -16,8 +17,8 @@
   <main>
     <div class="local-intro">
       <p class="local-kicker">Meeyanoor, Kollam</p>
-      <h1>Gaming prices and payment</h1>
-      <p>Pay for a timed gaming session at Wildcat IT Solutions. Ask at the counter to confirm station availability and get a payment link for your session.</p>
+      <h1>Gaming prices and booking</h1>
+      <p>Request a timed gaming session at Wildcat IT Solutions and pay at the shop.</p>
       <table>
         <thead><tr><th scope="col">Session length</th><th scope="col">Price</th></tr></thead>
         <tbody>
@@ -27,6 +28,25 @@
         </tbody>
       </table>
     </div>
+    <section>
+      <h2>Request a booking</h2>
+      <p>Your booking is confirmed when the shop replies.</p>
+      <form id="booking-request" hidden>
+        <p><label>Your name <input name="customer" required maxlength="80" autocomplete="name"></label></p>
+        <p><label>Preferred date <input name="date" type="date" required></label></p>
+        <p><label>Preferred start time (IST) <input name="time" type="time" required></label></p>
+        <p><label>Session length
+          <select name="duration" required>
+            <option>1 hour (₹200)</option>
+            <option>2 hours (₹350)</option>
+            <option>3 hours (₹500)</option>
+          </select>
+        </label></p>
+        <button class="local-call" type="submit">Continue to WhatsApp</button>
+        <p>Review and send the prepared message in WhatsApp.</p>
+        <p id="booking-status" role="status"></p>
+      </form>
+    </section>
     <section id="checkout" hidden>
       <h2>Your gaming session</h2>
       <p id="summary"></p>
