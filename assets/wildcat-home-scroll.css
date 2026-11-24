@@ -113,3 +113,17 @@ p{max-width:54ch;color:var(--muted)}
 }
 @keyframes service-enter{from{opacity:.25;transform:translateY(1.25rem)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:no-preference){.story.has-entered .copy{animation:service-enter .55s ease-out both}}
+@media(min-width:62rem) and (prefers-reduced-motion:no-preference){
+ .motion-ready .scroll-chapter{min-height:76svh;align-items:center}
+ .motion-ready .scroll-chapter .copy,.motion-ready .scroll-chapter .visual{position:static}
+ .motion-ready .scroll-chapter .copy{padding-top:0}
+}
+@media(max-width:61.99rem){
+ .hero-title{position:static;width:min(16rem,72%);height:auto;clip-path:none;margin-bottom:2rem;overflow:visible}
+ .hero-title img{height:auto;width:100%}
+}
+.service-nav{gap:.55rem}
+.service-nav a,.service-contact a{display:inline-flex;align-items:center;min-height:44px;border-radius:.65rem;background:#18181b;padding-inline:.9rem}
+.cta,.secondary,.top .nav-cafe{border-radius:.65rem}
+.call-wildcat::before{mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='M5 3h4l2 5-3 2a15 15 0 0 0 6 6l2-3 5 2v4q0 2-2 2C10 21 3 14 3 5q0-2 2-2Z'/%3E%3C/svg%3E") center/contain no-repeat}
+.terms{max-width:50rem;margin:auto;padding:2rem 1.2rem 5rem}.terms .wrap{width:100%;margin-top:2rem}.terms h1{font-size:clamp(3rem,7vw,5rem)}.terms h2{margin-top:2rem;font-size:2rem}

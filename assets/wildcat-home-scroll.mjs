@@ -3,13 +3,8 @@ const stages = [...document.querySelectorAll('[data-models]')];
 const scenes = new WeakMap();
 const loading = new WeakSet();
 const clamp = value => Math.max(0, Math.min(1, value));
-const sticky = matchMedia('(min-width: 62rem)');
 function scrollPose(stage, bounds) {
-  if (sticky.matches && stage.closest('.scroll-chapter')) {
-    const chapter = stage.closest('.scroll-chapter').getBoundingClientRect();
-    return clamp((innerHeight * .74 - chapter.top) / Math.max(1, chapter.height - innerHeight * .42));
-  }
-  return clamp((innerHeight * .86 - bounds.top) / (innerHeight * .58 + bounds.height * .14));
+  return clamp((innerHeight - bounds.top) / (innerHeight + bounds.height));
 }
 let frame;
 let libraries;
@@ -46,7 +41,7 @@ async function prepare(stage) {
     const names = stage.dataset.models.split(' ');
     const isTower = names[0] === 'desktop';
     const isLaptop = names[0] === 'laptop-studio';
-    const isBoard = names[0] === 'motherboard';
+    const isBoard = names[0] === 'service-board';
     const loader = new GLTFLoader();
     const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb' + (name === 'laptop-studio' ? '?v=2' : ''))));
     const scene = new T.Scene();
@@ -131,7 +126,7 @@ async function prepare(stage) {
       if (!clientWidth || !clientHeight) return;
       camera.aspect = clientWidth / clientHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(clientWidth, clientHeight);
+      renderer.setSize(clientWidth, clientHeight, false);
       schedule();
     };
     canvas.addEventListener('webglcontextlost', () => {
@@ -182,7 +177,7 @@ const reveal = new IntersectionObserver(entries => {
 for (const copy of document.querySelectorAll('.story .copy')) reveal.observe(copy);
 const observer = new IntersectionObserver(entries => {
   for (const entry of entries) if (entry.isIntersecting) prepare(entry.target);
-}, { rootMargin: '140px' });
+}, { rootMargin: '500px' });
 for (const stage of stages) observer.observe(stage);
 addEventListener('scroll', schedule, { passive: true });
 addEventListener('resize', schedule, { passive: true });
