@@ -31,6 +31,7 @@ async function prepare(stage) {
     const [T, { GLTFLoader }] = await libraries;
     const names = stage.dataset.models.split(' ');
     const isTower = names[0] === 'desktop';
+    const isLaptop = names[0] === 'laptop-studio';
     const isPair = names.length > 1;
     const loader = new GLTFLoader();
     const models = await Promise.all(names.map(name => loader.loadAsync('/media/models/' + name + '.glb')));
@@ -40,7 +41,7 @@ async function prepare(stage) {
     models.forEach(({ scene: model }, index) => {
       const bounds = new T.Box3().setFromObject(model);
       const pivot = new T.Group();
-      const size = isPair ? (index === 0 ? 2.65 : 1.95) : 3.4;
+      const size = isPair ? (index === 0 ? 2.65 : 1.95) : (isLaptop ? 4.1 : 3.4);
       pivot.scale.setScalar(size / bounds.getSize(new T.Vector3()).length());
       model.position.sub(bounds.getCenter(new T.Vector3()));
       if (isPair) pivot.position.set(index === 0 ? -1.08 : 1.22, index === 0 ? -.18 : .24, 0);
@@ -71,7 +72,8 @@ async function prepare(stage) {
     };
     scene.add(new T.HemisphereLight(0xfff6ef, 0x665c6f, 1.5));
     light(0xfff6f0, 2.55, [3, 5, 4]);
-    light(0xff425d, 2, [-3, 2, -2]);
+    light(0xff425d, 1.35, [-3, 2, -2]);
+    light(0xdce7ff, 1.8, [-3, 4, 6]);
 
     const renderer = new T.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
@@ -88,7 +90,7 @@ async function prepare(stage) {
       const opening = clamp((progress - .19) / .53);
       const eased = opening * opening * (3 - 2 * opening);
       turns.forEach((pivot, index) => {
-        pivot.rotation.y = (index ? -.17 : .3) - .48 * progress + tiltX * .34 + spin;
+        pivot.rotation.y = (isLaptop ? -1.38 : index ? -.17 : .3) - (isLaptop ? .28 : .48) * progress + tiltX * .34 + spin;
         pivot.rotation.x = tiltY * .18;
       });
       if (hinge) hinge.rotation.y = -1.1 * eased;

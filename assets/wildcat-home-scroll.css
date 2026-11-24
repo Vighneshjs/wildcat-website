@@ -94,3 +94,5 @@ p{max-width:54ch;color:var(--muted)}
 .top .nav-cafe{display:inline-flex;align-items:center;justify-content:center;min-height:2.8rem;padding:.55rem .95rem;border:1px solid #ed6572;border-radius:.3rem;background:linear-gradient(155deg,#3a141a,#1e1013);color:#fff;font-weight:700;white-space:nowrap}
 .top .nav-cafe:hover{background:#61202a;border-color:#ffa3ab}
 @media(max-width:42rem){.top .wrap{flex-wrap:wrap;padding-block:.4rem}.top nav{gap:.35rem}.top nav .nav-cafe{padding-inline:.55rem;font-size:.88rem}}
+#laptop.story{padding-block:clamp(1.35rem,2.5vw,2.5rem)}
+.laptop img{width:90%;height:90%;filter:drop-shadow(0 14px 18px #0009)}
