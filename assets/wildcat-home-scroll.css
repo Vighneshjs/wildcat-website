@@ -56,7 +56,7 @@ p{max-width:54ch;color:var(--muted)}
 @media(max-width:42rem){
   .wrap{width:calc(100% - 2rem)}
   .top nav{gap:.65rem;font-size:.95rem}
-  .top nav .nav-cafe{display:none}
+  .top nav .nav-cafe{padding-inline:.55rem;font-size:.88rem}
   .top .secondary,.top .cta{padding-inline:.6rem;font-size:.88rem}
   .brand img{width:clamp(5.1rem,24vw,8rem)}
   .hero{min-height:0;padding-block:2.6rem}
@@ -90,3 +90,7 @@ p{max-width:54ch;color:var(--muted)}
   .hero-title{position:static;width:100%;height:auto;max-width:37rem;clip-path:none;overflow:visible}.hero-title img{width:100%;height:auto;filter:drop-shadow(0 2px #361519)}
   .top .brand img{width:2.45rem;height:3rem;object-fit:contain}
 }
+
+.top .nav-cafe{display:inline-flex;align-items:center;justify-content:center;min-height:2.8rem;padding:.55rem .95rem;border:1px solid #ed6572;border-radius:.3rem;background:linear-gradient(155deg,#3a141a,#1e1013);color:#fff;font-weight:700;white-space:nowrap}
+.top .nav-cafe:hover{background:#61202a;border-color:#ffa3ab}
+@media(max-width:42rem){.top .wrap{flex-wrap:wrap;padding-block:.4rem}.top nav{gap:.35rem}.top nav .nav-cafe{padding-inline:.55rem;font-size:.88rem}}
