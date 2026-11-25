@@ -37,11 +37,15 @@ function database() {
 
 test('shared capacity, atomic owner edits, and captured payment replay', async t => {
   const DB = database();
-  const env = { DB, OWNER_TOKEN: 'owner-test', RAZORPAY_KEY_ID: 'rzp_test_x',
+  const env = { DB, SITE_ORIGIN: 'https://staging.example.net', OWNER_TOKEN: 'owner-test', RAZORPAY_KEY_ID: 'rzp_test_x',
     RAZORPAY_KEY_SECRET: 'test-key', RAZORPAY_WEBHOOK_SECRET: 'test-webhook' };
   const date = new Date(Date.now() + 86400000 + 19800000).toISOString().slice(0, 10);
   let orders = 0;
   t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    if (String(_url).endsWith('/payments/pay_checkout')) {
+      return Response.json({ id: 'pay_checkout', order_id: 'order_test1', amount: 20000,
+        currency: 'INR', status: 'captured' });
+    }
     const data = JSON.parse(options.body);
     return Response.json({ id: 'order_test' + ++orders, amount: data.amount, currency: data.currency });
   });
@@ -79,8 +83,12 @@ test('shared capacity, atomic owner edits, and captured payment replay', async t
     return worker.fetch(new Request('https://example.net/webhook', { method: 'POST', body,
       headers: { 'X-Razorpay-Signature': signature } }), env);
   }
-  assert.equal((await webhook(customer, 'pay_first')).status, 200);
-  assert.equal((await webhook(customer, 'pay_first')).status, 200);
+  const signature = createHmac('sha256', env.RAZORPAY_KEY_SECRET)
+    .update(customer.orderId + '|pay_checkout').digest('hex');
+  const payment = { id: customer.id, paymentId: 'pay_checkout', signature };
+  assert.equal((await api('/verify', { ...payment, signature: '0'.repeat(64) })).status, 400);
+  assert.equal((await (await api('/verify', payment)).json()).status, 'confirmed');
+  assert.equal((await webhook(customer, 'pay_checkout')).status, 200);
   assert.equal((await webhook(expiry, 'pay_late')).status, 200);
   assert.equal(DB.db.prepare('SELECT status FROM bookings WHERE id=?').get(customer.id).status, 'confirmed');
   assert.equal(DB.db.prepare('SELECT status FROM bookings WHERE id=?').get(expiry.id).status, 'payment_review');
@@ -88,4 +96,28 @@ test('shared capacity, atomic owner edits, and captured payment replay', async t
   assert.equal((await api('/owner/cancel', { id: customer.id }, true)).status, 409);
   assert.equal((await api('/owner/cancel', { id: owner.id }, true)).status, 200);
   assert.equal(DB.db.prepare('SELECT COUNT(*) AS count FROM blocks WHERE booking_id=?').get(owner.id).count, 0);
+});
+
+test('Razorpay Test Mode creates an order for the selected package', {
+  skip: !process.env.WILDCAT_TEST_RAZORPAY_ID,
+}, async () => {
+  const DB = database();
+  DB.db.exec('UPDATE settings SET online=1');
+  const env = {
+    DB, SITE_ORIGIN: 'https://staging.example.net',
+    RAZORPAY_KEY_ID: process.env.WILDCAT_TEST_RAZORPAY_ID,
+    RAZORPAY_KEY_SECRET: process.env.WILDCAT_TEST_RAZORPAY_SECRET,
+    RAZORPAY_WEBHOOK_SECRET: 'isolated-test',
+  };
+  assert.ok(env.RAZORPAY_KEY_ID.startsWith('rzp_test_'));
+  const date = new Date(Date.now() + 86400000 + 19800000).toISOString().slice(0, 10);
+  const response = await worker.fetch(new Request('https://staging.example.net/bookings', {
+    method: 'POST', body: JSON.stringify({ date, time: '11:00', minutes: 120,
+      name: 'Wildcat QA', phone: '9999999999' }),
+  }), env);
+  assert.equal(response.status, 201);
+  const booking = await response.json();
+  assert.match(booking.orderId, /^order_/);
+  assert.equal(booking.amount, 35000);
+  assert.equal(DB.db.prepare('SELECT COUNT(*) AS count FROM blocks').get().count, 4);
 });

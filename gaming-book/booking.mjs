@@ -23,7 +23,7 @@ date.max = new Date(Date.parse(date.min) + 14 * 86400000).toISOString().slice(0,
 function updateSummary() {
   const time = form.elements.time?.value;
   if (!locked) get('selection').textContent = time ? describe({ date: date.value, time, minutes: minutes.value }) : 'Choose a start time';
-  get('amount').textContent = result?.online ? rupees(result.amount) : '—';
+  get('amount').textContent = result?.amount > 0 ? rupees(result.amount) : '—';
   pay.disabled = busy || locked || !result?.online || !time;
   pay.textContent = result?.online ? 'Pay ' + rupees(result.amount) : 'Online booking unavailable';
   get('payment-note').textContent = result?.online ? 'Secure checkout with Razorpay' : 'Request a slot on WhatsApp or call the gaming café.';

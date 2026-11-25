@@ -31,8 +31,13 @@ function customerAmount(minutes, config) {
   if (minutes === 60) return config.hourly_paise;
   return minutes === 120 ? config.two_hour_paise : config.three_hour_paise;
 }
+const productionOrigin = 'https://wildcatdesk.shop';
+const paymentReady = env => Boolean(env.RAZORPAY_KEY_SECRET && env.RAZORPAY_WEBHOOK_SECRET &&
+  ((env.SITE_ORIGIN || productionOrigin) === productionOrigin
+    ? env.RAZORPAY_KEY_ID?.startsWith('rzp_live_')
+    : env.RAZORPAY_KEY_ID?.startsWith('rzp_test_')));
 const availableOnline = (env, config) => Boolean(config.online && [config.hourly_paise, config.two_hour_paise, config.three_hour_paise].every(price => price >= 100) &&
-  env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_SECRET && env.RAZORPAY_WEBHOOK_SECRET);
+  paymentReady(env));
 async function availability(env, params, config) {
   const [open, close] = windowFor(params.get('date'), config);
   const minutes = Number(params.get('minutes'));
@@ -149,6 +154,7 @@ async function ownerRoute(request, env, path) {
       [data.hourly_paise, data.two_hour_paise, data.three_hour_paise].every(price =>
         Number.isInteger(price) && price >= 100 && price <= 1000000),
     'Check the hours, station count and package prices.');
+    check(!data.online || paymentReady(env), 'Configure checkout for this environment before enabling online bookings.', 409);
     await sql(env, 'UPDATE settings SET opens=?,closes=?,stations=?,hourly_paise=?,two_hour_paise=?,three_hour_paise=?,online=? WHERE id=1',
       data.opens, data.closes, data.stations, data.hourly_paise, data.two_hour_paise, data.three_hour_paise, data.online ? 1 : 0).run();
     return reply(await settings(env));
@@ -216,7 +222,7 @@ async function route(request, env, url) {
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin');
-    const allowed = origin && origin === (env.SITE_ORIGIN || 'https://wildcatdesk.shop');
+    const allowed = origin && origin === (env.SITE_ORIGIN || productionOrigin);
     let response;
     try {
       check(!origin || allowed, 'Origin is not allowed.', 403);
