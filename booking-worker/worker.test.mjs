@@ -62,12 +62,18 @@ test('shared capacity, atomic owner edits, and captured payment replay', async t
   assert.equal((await api('/owner/bookings', { ...booking, time: '19:00' }, true)).status, 400);
   const owner = await (await api('/owner/bookings', booking, true)).json();
   assert.ok(owner.id);
+  const slots = async () => (await (await api('/availability?date=' + date + '&minutes=60')).json()).slots;
+  const stateAt = async time => (await slots()).find(slot => slot.time === time).status;
+  assert.equal(await stateAt('10:00'), 'booked');
+  assert.equal(await stateAt('10:30'), 'booked');
+  assert.equal(await stateAt('11:00'), 'available');
   assert.equal((await api('/bookings', { ...booking, time: '10:30' })).status, 409);
 
   const attempts = await Promise.all([api('/bookings', { ...booking, time: '11:00' }),
     api('/bookings', { ...booking, time: '11:00' })]);
   assert.deepEqual(attempts.map(response => response.status).sort(), [201, 409]);
   const customer = await attempts.find(response => response.ok).json();
+  assert.equal(await stateAt('11:00'), 'held');
   assert.equal((await api('/owner/bookings', { ...booking, id: owner.id, minutes: 90 }, true)).status, 409);
   assert.equal(DB.db.prepare('SELECT COUNT(*) AS count FROM blocks WHERE booking_id=?').get(owner.id).count, 2);
   assert.equal((await api('/owner/bookings', { ...booking, id: owner.id, time: '12:00' }, true)).status, 201);
@@ -88,6 +94,7 @@ test('shared capacity, atomic owner edits, and captured payment replay', async t
   const payment = { id: customer.id, paymentId: 'pay_checkout', signature };
   assert.equal((await api('/verify', { ...payment, signature: '0'.repeat(64) })).status, 400);
   assert.equal((await (await api('/verify', payment)).json()).status, 'confirmed');
+  assert.equal(await stateAt('11:00'), 'booked');
   assert.equal((await webhook(customer, 'pay_checkout')).status, 200);
   assert.equal((await webhook(expiry, 'pay_late')).status, 200);
   assert.equal(DB.db.prepare('SELECT status FROM bookings WHERE id=?').get(customer.id).status, 'confirmed');

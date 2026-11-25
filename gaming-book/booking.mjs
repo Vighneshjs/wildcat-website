@@ -36,11 +36,11 @@ async function refresh() {
   try {
     const latest = await request('/availability?' + params);
     if (requestNumber !== sequence) return;
-    const slots = latest.slots.filter(slot => slot.remaining).map(slot => slot.time);
-    const signature = [day, ...slots].join('/');
+    const slots = latest.slots;
+    const signature = JSON.stringify([day, ...slots]);
     if (signature !== visibleTimes) {
       const selected = form.elements.time?.value;
-      times.replaceChildren(...slots.map(time => {
+      times.replaceChildren(...slots.map(({ time, remaining, status: slotStatus }) => {
         const label = document.createElement('label');
         const radio = document.createElement('input');
         const caption = document.createElement('span');
@@ -48,14 +48,20 @@ async function refresh() {
         radio.name = 'time';
         radio.value = time;
         radio.required = true;
-        radio.checked = time === selected;
+        radio.disabled = !remaining;
+        radio.checked = Boolean(remaining) && time === selected;
         caption.textContent = formatTime(day, time);
+        if (!remaining) {
+          const state = document.createElement('small');
+          state.textContent = slotStatus === 'held' ? 'On hold' : 'Booked';
+          caption.append(state);
+        }
         label.append(radio, caption);
         return label;
       }));
       visibleTimes = signature;
     }
-    const message = slots.length ? '' : 'No times available. Try another date or a shorter session.';
+    const message = slots.some(slot => slot.remaining) ? '' : 'No times available. Try another date or a shorter session.';
     if (get('availability').textContent !== message) get('availability').textContent = message;
     result = latest;
   } catch {

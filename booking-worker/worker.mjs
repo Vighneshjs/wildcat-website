@@ -42,19 +42,22 @@ async function availability(env, params, config) {
   const [open, close] = windowFor(params.get('date'), config);
   const minutes = Number(params.get('minutes'));
   const length = customerLength(minutes);
-  const { results } = await sql(env, `SELECT b.station,b.starts FROM blocks b JOIN bookings r
+  const { results } = await sql(env, `SELECT b.station,b.starts,r.status FROM blocks b JOIN bookings r
     ON r.id=b.booking_id WHERE b.starts>=? AND b.starts<?
     AND (r.status='confirmed' OR (r.status='held' AND r.expires>unixepoch()))`, open, close).all();
-  const occupied = new Set(results.map(row => row.station + '/' + row.starts));
+  const occupied = new Map(results.map(row => [row.station + '/' + row.starts, row.status]));
   const slots = [];
   for (let start = open; start + length <= close; start += BLOCK) {
     if (start < now() + 60) continue;
     let remaining = 0;
+    let withoutHolds = 0;
     for (let station = 1; station <= config.stations; station++) {
       const blocks = Array.from({ length: length / BLOCK }, (_, index) => start + index * BLOCK);
       if (blocks.every(block => !occupied.has(station + '/' + block))) remaining++;
+      if (blocks.every(block => occupied.get(station + '/' + block) !== 'confirmed')) withoutHolds++;
     }
-    slots.push({ time: new Date((start + 19800) * 1000).toISOString().slice(11, 16), remaining });
+    slots.push({ time: new Date((start + 19800) * 1000).toISOString().slice(11, 16), remaining,
+      status: remaining ? 'available' : withoutHolds ? 'held' : 'booked' });
   }
   return { slots, amount: customerAmount(minutes, config), online: availableOnline(env, config) };
 }
