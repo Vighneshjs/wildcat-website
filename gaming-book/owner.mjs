@@ -105,6 +105,27 @@ settings.addEventListener('submit', async event => {
     hourly_paise: Math.round(Number(data.rate) * 100), two_hour_paise: Math.round(Number(data.twoHour) * 100),
     three_hour_paise: Math.round(Number(data.threeHour) * 100), online: settings.elements.online.checked }, 'Settings saved.');
 });
+const verification = document.querySelector('#verify-booking');
+verification.addEventListener('submit', async event => {
+  event.preventDefault();
+  const output = document.querySelector('#verify-result');
+  const button = verification.querySelector('button');
+  button.disabled = true;
+  output.textContent = 'Checking booking…';
+  try {
+    const id = verification.elements.reference.value.trim();
+    const booking = await request('/owner/verify?id=' + encodeURIComponent(id), null, token);
+    const states = { held: 'Awaiting payment', confirmed: booking.payment_id ? 'Paid and confirmed' : 'Owner reservation',
+      payment_review: 'Payment requires review', cancelled: 'Cancelled' };
+    output.textContent = (states[booking.status] || booking.status) + ' · ' +
+      format.format(booking.starts * 1000) + ' to ' + format.format(booking.ends * 1000) +
+      ' IST · Station ' + booking.station + ' · ' + rupees(booking.amount);
+  } catch (error) {
+    output.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
 session.addEventListener('submit', async event => {
   event.preventDefault();
   const data = Object.fromEntries(new FormData(session));

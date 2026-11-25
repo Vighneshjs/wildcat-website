@@ -22,5 +22,8 @@
 <label>Name <input name="name" maxlength="80" required></label>
 <label>Mobile number (optional) <input name="phone" type="tel"></label>
 <button>Save session</button><button id="reset-session" type="button" hidden>Stop editing</button></form></section>
+<section><h2>Verify a booking</h2><form id="verify-booking"><label>Booking reference
+<input name="reference" required maxlength="36" autocomplete="off"></label>
+<button>Check booking</button></form><p id="verify-result" role="status"></p></section>
 <section><h2>Upcoming sessions and payment reviews</h2><ul id="schedule"></ul></section>
 </div></main></body></html>

@@ -147,6 +147,14 @@ async function recordPayment(env, booking, payment) {
 async function ownerRoute(request, env, path) {
   check(env.OWNER_TOKEN && request.headers.get('Authorization') === 'Bearer ' + env.OWNER_TOKEN,
     'Owner sign-in required.', 401);
+  if (request.method === 'GET' && path === '/owner/verify') {
+    const id = new URL(request.url).searchParams.get('id')?.trim();
+    check(/^[0-9a-f-]{36}$/i.test(id || ''), 'Enter the full booking reference.');
+    const booking = await sql(env, `SELECT id, starts, ends, station, amount, status, payment_id
+      FROM bookings WHERE id=?`, id.toLowerCase()).first();
+    check(booking, 'No booking matches this reference.', 404);
+    return reply(booking);
+  }
   if (request.method === 'GET' && path === '/owner') {
     const { results } = await sql(env, `SELECT * FROM bookings WHERE status='payment_review'
       OR status='confirmed' AND ends>? ORDER BY starts LIMIT 250`, now() - DAY).all();
