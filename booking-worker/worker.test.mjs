@@ -52,8 +52,9 @@ test('shared capacity, atomic owner edits, and captured payment replay', async t
   const booking = { date, time: '10:00', minutes: 60, name: 'Test Player', phone: '9876543210' };
   assert.equal((await api('/owner')).status, 401);
   const settings = await api('/owner/settings', { opens: '10:00', closes: '19:30',
-    stations: 1, hourly_paise: 20000, online: true }, true);
+    stations: 1, hourly_paise: 20000, two_hour_paise: 35000, three_hour_paise: 50000, online: true }, true);
   assert.equal(settings.status, 200);
+  assert.equal((await (await api('/availability?date=' + date + '&minutes=120')).json()).amount, 35000);
   assert.equal((await api('/owner/bookings', { ...booking, time: '19:00' }, true)).status, 400);
   const owner = await (await api('/owner/bookings', booking, true)).json();
   assert.ok(owner.id);

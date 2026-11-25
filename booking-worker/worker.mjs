@@ -23,11 +23,20 @@ function lengthOf(minutes) {
     'Choose 30 minutes to 3 hours.');
   return minutes * 60;
 }
-const availableOnline = (env, config) => Boolean(config.online && config.hourly_paise >= 200 &&
+function customerLength(minutes) {
+  check([60, 120, 180].includes(minutes), 'Choose a 1, 2 or 3 hour package.');
+  return lengthOf(minutes);
+}
+function customerAmount(minutes, config) {
+  if (minutes === 60) return config.hourly_paise;
+  return minutes === 120 ? config.two_hour_paise : config.three_hour_paise;
+}
+const availableOnline = (env, config) => Boolean(config.online && [config.hourly_paise, config.two_hour_paise, config.three_hour_paise].every(price => price >= 100) &&
   env.RAZORPAY_KEY_ID && env.RAZORPAY_KEY_SECRET && env.RAZORPAY_WEBHOOK_SECRET);
 async function availability(env, params, config) {
   const [open, close] = windowFor(params.get('date'), config);
-  const length = lengthOf(Number(params.get('minutes')));
+  const minutes = Number(params.get('minutes'));
+  const length = customerLength(minutes);
   const { results } = await sql(env, `SELECT b.station,b.starts FROM blocks b JOIN bookings r
     ON r.id=b.booking_id WHERE b.starts>=? AND b.starts<?
     AND (r.status='confirmed' OR (r.status='held' AND r.expires>unixepoch()))`, open, close).all();
@@ -42,13 +51,13 @@ async function availability(env, params, config) {
     }
     slots.push({ time: new Date((start + 19800) * 1000).toISOString().slice(11, 16), remaining });
   }
-  return { slots, amount: config.hourly_paise * length / 3600, online: availableOnline(env, config) };
+  return { slots, amount: customerAmount(minutes, config), online: availableOnline(env, config) };
 }
 async function reserve(env, data, config, owner) {
   const [open, close] = windowFor(data.date, config);
   check(validTime.test(data.time), 'Choose a start time.');
   const start = instant(data.date, data.time);
-  const end = start + lengthOf(data.minutes);
+  const end = start + (owner ? lengthOf(data.minutes) : customerLength(data.minutes));
   check(start >= open && end <= close && (owner ? end > now() : start >= now() + 60),
     'Choose a session within opening hours.');
   const name = typeof data.name === 'string' ? data.name.trim() : '';
@@ -56,7 +65,7 @@ async function reserve(env, data, config, owner) {
   check(name.length >= 2 && name.length <= 80 && ((owner && !phone) || /^\+?\d{10,15}$/.test(phone)),
     'Enter a name and a valid mobile number.');
   check(owner || availableOnline(env, config), 'Online booking is currently closed.', 503);
-  const amount = owner ? 0 : config.hourly_paise * data.minutes / 60;
+  const amount = owner ? 0 : customerAmount(data.minutes, config);
   const id = owner && data.id ? data.id : crypto.randomUUID();
   const editing = owner && Boolean(data.id);
   const expires = owner ? null : Math.min(now() + 600, start);
@@ -137,11 +146,11 @@ async function ownerRoute(request, env, path) {
   if (path === '/owner/settings') {
     check(validTime.test(data.opens) && validTime.test(data.closes) && data.opens < data.closes &&
       Number.isInteger(data.stations) && data.stations >= 1 && data.stations <= 20 &&
-      Number.isInteger(data.hourly_paise) && data.hourly_paise >= 0 && data.hourly_paise <= 1000000 &&
-      data.hourly_paise % 2 === 0 && (!data.online || data.hourly_paise >= 200),
-    'Check the hours, station count and hourly rate.');
-    await sql(env, 'UPDATE settings SET opens=?,closes=?,stations=?,hourly_paise=?,online=? WHERE id=1',
-      data.opens, data.closes, data.stations, data.hourly_paise, data.online ? 1 : 0).run();
+      [data.hourly_paise, data.two_hour_paise, data.three_hour_paise].every(price =>
+        Number.isInteger(price) && price >= 100 && price <= 1000000),
+    'Check the hours, station count and package prices.');
+    await sql(env, 'UPDATE settings SET opens=?,closes=?,stations=?,hourly_paise=?,two_hour_paise=?,three_hour_paise=?,online=? WHERE id=1',
+      data.opens, data.closes, data.stations, data.hourly_paise, data.two_hour_paise, data.three_hour_paise, data.online ? 1 : 0).run();
     return reply(await settings(env));
   }
   if (path === '/owner/bookings') return reply(await reserve(env, data, await settings(env), true), 201);

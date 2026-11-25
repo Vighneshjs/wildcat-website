@@ -28,6 +28,8 @@ async function refresh(loadSettings = false) {
   if (loadSettings) {
     for (const field of ['opens', 'closes', 'stations']) settings.elements[field].value = result.settings[field];
     settings.elements.rate.value = result.settings.hourly_paise / 100;
+    settings.elements.twoHour.value = result.settings.two_hour_paise / 100;
+    settings.elements.threeHour.value = result.settings.three_hour_paise / 100;
     settings.elements.online.checked = Boolean(result.settings.online);
   }
   const nextFingerprint = JSON.stringify(result.bookings);
@@ -100,7 +102,8 @@ settings.addEventListener('submit', async event => {
   event.preventDefault();
   const data = Object.fromEntries(new FormData(settings));
   await submit('/owner/settings', { opens: data.opens, closes: data.closes, stations: Number(data.stations),
-    hourly_paise: Math.round(Number(data.rate) * 100), online: settings.elements.online.checked }, 'Settings saved.');
+    hourly_paise: Math.round(Number(data.rate) * 100), two_hour_paise: Math.round(Number(data.twoHour) * 100),
+    three_hour_paise: Math.round(Number(data.threeHour) * 100), online: settings.elements.online.checked }, 'Settings saved.');
 });
 session.addEventListener('submit', async event => {
   event.preventDefault();

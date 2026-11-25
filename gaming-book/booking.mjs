@@ -26,7 +26,7 @@ function updateSummary() {
   get('amount').textContent = result?.online ? rupees(result.amount) : '—';
   pay.disabled = busy || locked || !result?.online || !time;
   pay.textContent = result?.online ? 'Pay ' + rupees(result.amount) : 'Online booking unavailable';
-  get('payment-note').textContent = result?.online ? 'Secure checkout with Razorpay' : 'Call the gaming café to book.';
+  get('payment-note').textContent = result?.online ? 'Secure checkout with Razorpay' : 'Request a slot on WhatsApp or call the gaming café.';
 }
 
 async function refresh() {

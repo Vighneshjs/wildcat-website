@@ -4,9 +4,11 @@ CREATE TABLE IF NOT EXISTS settings (
   closes TEXT NOT NULL,
   stations INTEGER NOT NULL,
   hourly_paise INTEGER NOT NULL,
-  online INTEGER NOT NULL
+  online INTEGER NOT NULL,
+  two_hour_paise INTEGER NOT NULL DEFAULT 35000,
+  three_hour_paise INTEGER NOT NULL DEFAULT 50000
 );
-INSERT OR IGNORE INTO settings VALUES (1, '10:00', '19:30', 1, 0, 0);
+INSERT OR IGNORE INTO settings (id, opens, closes, stations, hourly_paise, online) VALUES (1, '10:00', '19:30', 1, 20000, 0);
 
 CREATE TABLE IF NOT EXISTS bookings (
   id TEXT PRIMARY KEY,
