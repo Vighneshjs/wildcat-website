@@ -1,4 +1,5 @@
 const BLOCK = 1800;
+const HOUR = 3600;
 const DAY = 86400;
 const now = () => Math.floor(Date.now() / 1000);
 const sql = (env, statement, ...args) => env.DB.prepare(statement).bind(...args);
@@ -47,7 +48,8 @@ async function availability(env, params, config) {
     AND (r.status='confirmed' OR (r.status='held' AND r.expires>unixepoch()))`, open, close).all();
   const occupied = new Map(results.map(row => [row.station + '/' + row.starts, row.status]));
   const slots = [];
-  for (let start = open; start + length <= close; start += BLOCK) {
+  const firstHour = Math.ceil((open + BLOCK) / HOUR) * HOUR - BLOCK;
+  for (let start = firstHour; start + length <= close; start += HOUR) {
     if (start < now() + 60) continue;
     let remaining = 0;
     let withoutHolds = 0;
@@ -63,7 +65,8 @@ async function availability(env, params, config) {
 }
 async function reserve(env, data, config, owner) {
   const [open, close] = windowFor(data.date, config);
-  check(validTime.test(data.time), 'Choose a start time.');
+  check(typeof data.time === 'string' && validTime.test(data.time) && (owner || data.time.endsWith(':00')),
+    owner ? 'Choose a start time.' : 'Choose a start time on the hour.');
   const start = instant(data.date, data.time);
   const end = start + (owner ? lengthOf(data.minutes) : customerLength(data.minutes));
   check(start >= open && end <= close && (owner ? end > now() : start >= now() + 60),

@@ -63,11 +63,13 @@ test('shared capacity, atomic owner edits, and captured payment replay', async t
   const owner = await (await api('/owner/bookings', booking, true)).json();
   assert.ok(owner.id);
   const slots = async () => (await (await api('/availability?date=' + date + '&minutes=60')).json()).slots;
-  const stateAt = async time => (await slots()).find(slot => slot.time === time).status;
+  const stateAt = async time => (await slots()).find(slot => slot.time === time)?.status;
   assert.equal(await stateAt('10:00'), 'booked');
-  assert.equal(await stateAt('10:30'), 'booked');
+  assert.equal(await stateAt('10:30'), undefined);
+  assert.equal(await stateAt('19:00'), undefined);
+  assert.ok((await slots()).every(slot => slot.time.endsWith(':00')));
   assert.equal(await stateAt('11:00'), 'available');
-  assert.equal((await api('/bookings', { ...booking, time: '10:30' })).status, 409);
+  assert.equal((await api('/bookings', { ...booking, time: '10:30' })).status, 400);
 
   const attempts = await Promise.all([api('/bookings', { ...booking, time: '11:00' }),
     api('/bookings', { ...booking, time: '11:00' })]);

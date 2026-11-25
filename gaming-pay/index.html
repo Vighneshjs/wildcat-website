@@ -34,7 +34,7 @@
       <form id="booking-request" hidden>
         <p><label>Your name <input name="customer" required maxlength="80" autocomplete="name"></label></p>
         <p><label>Preferred date <input name="date" type="date" required></label></p>
-        <p><label>Preferred start time (IST) <input name="time" type="time" required></label></p>
+        <p><label>Preferred start time (IST) <input name="time" type="time" step="3600" required></label></p>
         <p><label>Session length
           <select name="duration" required>
             <option>1 hour (₹200)</option>

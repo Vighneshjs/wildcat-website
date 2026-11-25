@@ -8,9 +8,12 @@ const pay = get('pay');
 const status = get('status');
 const clock = new Intl.DateTimeFormat('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
 const calendar = new Intl.DateTimeFormat('en-IN', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Asia/Kolkata' });
-const formatTime = (day, time) => clock.format(new Date(day + 'T' + time + ':00+05:30'));
+function formatRange(day, time, length) {
+  const start = new Date(day + 'T' + time + ':00+05:30');
+  return clock.formatRange(start, new Date(start.getTime() + Number(length) * 60000));
+}
 const describe = ({ date: day, time, minutes: length }) =>
-  calendar.format(new Date(day + 'T12:00:00+05:30')) + ' · ' + formatTime(day, time) + ' IST · ' + length + ' min';
+  calendar.format(new Date(day + 'T12:00:00+05:30')) + ' · ' + formatRange(day, time, length) + ' IST · ' + length + ' min';
 
 let busy = false;
 let locked = false;
@@ -32,12 +35,13 @@ function updateSummary() {
 async function refresh() {
   const requestNumber = ++sequence;
   const day = date.value;
-  const params = new URLSearchParams({ date: day, minutes: minutes.value });
+  const length = minutes.value;
+  const params = new URLSearchParams({ date: day, minutes: length });
   try {
     const latest = await request('/availability?' + params);
     if (requestNumber !== sequence) return;
     const slots = latest.slots;
-    const signature = JSON.stringify([day, ...slots]);
+    const signature = JSON.stringify([day, length, ...slots]);
     if (signature !== visibleTimes) {
       const selected = form.elements.time?.value;
       times.replaceChildren(...slots.map(({ time, remaining, status: slotStatus }) => {
@@ -50,7 +54,7 @@ async function refresh() {
         radio.required = true;
         radio.disabled = !remaining;
         radio.checked = Boolean(remaining) && time === selected;
-        caption.textContent = formatTime(day, time);
+        caption.textContent = formatRange(day, time, length);
         if (!remaining) {
           const state = document.createElement('small');
           state.textContent = slotStatus === 'held' ? 'On hold' : 'Booked';
