@@ -1,7 +1,7 @@
-<!doctype html>
-<html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>Gaming schedule | Wildcat</title>
-<link rel="stylesheet" href="/assets/index-Y5XlWWtQ.css"><link rel="stylesheet" href="../booking.css">
+<!doctype html>
+<html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Gaming schedule | Wildcat</title>
+<link rel="stylesheet" href="/assets/index-Y5XlWWtQ.css"><link rel="stylesheet" href="../booking.css">
 <script type="module" src="../owner.mjs?v=verification2"></script><style>
 #schedule,#booking-history{list-style:none;padding:0}
 #schedule li,#booking-history li{padding:1rem 0;border-bottom:1px solid #c9c1b5}
@@ -11,30 +11,30 @@
 #panel dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));gap:.6rem 1rem;margin:.6rem 0}
 #panel dt{font-size:.85rem;font-weight:bold}
 #panel dd{margin:0;overflow-wrap:anywhere}
-</style></head>
-<body class="local-page"><header class="local-header"><a href="/">Wildcat IT Solutions</a></header>
-<main><div class="local-intro"><h1>Gaming schedule</h1></div>
-<section><form id="signin"><label>Owner access token <input name="token" type="password" required></label>
-<button>Open schedule</button></form><p id="status" role="status"></p></section>
-<div id="panel" class="booking-panel" hidden>
-<section><h2>Opening hours and rates</h2><form id="settings">
-<label>Opens (IST) <input name="opens" type="time" step="1800" required></label>
-<label>Closes (IST) <input name="closes" type="time" step="1800" required></label>
-<label>Stations <input name="stations" type="number" min="1" max="20" required></label>
-<label>1 hour (₹) <input name="rate" type="number" min="1" step=".01" required></label>
-<label>2 hours (₹) <input name="twoHour" type="number" min="1" step=".01" required></label><label>3 hours (₹) <input name="threeHour" type="number" min="1" step=".01" required></label><label><input name="online" type="checkbox">Accept online bookings</label><button>Save settings</button></form></section>
-<section><h2 id="session-title">Add an owner session</h2><form id="session">
-<label>Date <input name="date" type="date" required></label>
-<label>Start time (IST) <input name="time" type="time" step="1800" required></label>
-<label>Duration (minutes) <input name="minutes" type="number" min="30" max="180" step="30" value="60" required></label>
-<label>Station (optional) <input name="station" type="number" min="1" max="20"></label>
-<label>Name <input name="name" maxlength="80" required></label>
-<label>Mobile number (optional) <input name="phone" type="tel"></label>
-<button>Save session</button><button id="reset-session" type="button" hidden>Stop editing</button></form></section>
-<section><h2>Verify a booking</h2><form id="verify-booking"><label>Booking reference
-<input name="reference" required maxlength="36" autocomplete="off"></label>
-<button>Check booking</button></form><p id="verify-result" role="status"></p></section>
-<section><h2>Upcoming sessions and payment reviews</h2><ul id="schedule"></ul></section>
-<section><h2>Booking history</h2><p id="history-status" role="status"></p><ul id="booking-history"></ul>
-<button id="history-more" type="button" hidden>Load older bookings</button></section>
-</div></main></body></html>
+</style></head>
+<body class="local-page"><header class="local-header"><a href="/">Wildcat IT Solutions</a></header>
+<main><div class="local-intro"><h1>Gaming schedule</h1></div>
+<section><form id="signin"><label>Owner access token <input name="token" type="password" required></label>
+<button>Open schedule</button></form><p id="status" role="status"></p></section>
+<div id="panel" class="booking-panel" hidden>
+<section><h2>Opening hours and rates</h2><form id="settings">
+<label>Opens (IST) <input name="opens" type="time" step="1800" required></label>
+<label>Closes (IST) <input name="closes" type="time" step="1800" required></label>
+<label>Stations <input name="stations" type="number" min="1" max="20" required></label>
+<label>1 hour (₹) <input name="rate" type="number" min="1" step=".01" required></label>
+<label>2 hours (₹) <input name="twoHour" type="number" min="1" step=".01" required></label><label>3 hours (₹) <input name="threeHour" type="number" min="1" step=".01" required></label><label><input name="online" type="checkbox">Accept online bookings</label><button>Save settings</button></form></section>
+<section><h2 id="session-title">Add an owner session</h2><form id="session">
+<label>Date <input name="date" type="date" required></label>
+<label>Start time (IST) <input name="time" type="time" step="1800" required></label>
+<label>Duration (minutes) <input name="minutes" type="number" min="30" max="180" step="30" value="60" required></label>
+<label>Station (optional) <input name="station" type="number" min="1" max="20"></label>
+<label>Name <input name="name" maxlength="80" required></label>
+<label>Mobile number (optional) <input name="phone" type="tel"></label>
+<button>Save session</button><button id="reset-session" type="button" hidden>Stop editing</button></form></section>
+<section><h2>Verify a booking</h2><form id="verify-booking"><label>Booking reference
+<input name="reference" required maxlength="36" autocomplete="off"></label>
+<button>Check booking</button></form><p id="verify-result" role="status"></p></section>
+<section><h2>Upcoming sessions and payment reviews</h2><ul id="schedule"></ul></section>
+<section><h2>Booking history</h2><p id="history-status" role="status"></p><ul id="booking-history"></ul>
+<button id="history-more" type="button" hidden>Load older bookings</button></section>
+</div></main></body></html>
