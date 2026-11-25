@@ -5,6 +5,28 @@ import test from 'node:test';
 import { createHmac } from 'node:crypto';
 import worker from './worker.mjs';
 
+test('paid check-in is time-bound, station-bound and retryable only by the same PC', async () => {
+  const DB = database();
+  DB.db.exec(readFileSync(new URL('./counter-checkins.sql', import.meta.url), 'utf8'));
+  const id = '00000000-0000-4000-8000-000000000001';
+  DB.db.prepare(`INSERT INTO bookings VALUES (?, 'Player', '', unixepoch()-10,
+    unixepoch()+3590, 1, 20000, NULL, 'confirmed', 'order_fixture', NULL)`).run(id);
+  const api = (device, token = 'counter-test') => worker.fetch(new Request('https://example.net/counter/check-in', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: JSON.stringify({ id, device }),
+  }), { DB, COUNTER_TOKEN: 'counter-test' });
+  const device = 'a'.repeat(32);
+  assert.equal((await api(device, 'wrong')).status, 401);
+  assert.equal((await api(device)).status, 409);
+  DB.db.exec("UPDATE bookings SET payment_id='pay_fixture', starts=unixepoch()+10");
+  assert.equal((await api(device)).status, 409);
+  DB.db.exec("UPDATE bookings SET starts=unixepoch()-10, station=2");
+  assert.equal((await api(device)).status, 409);
+  DB.db.exec("UPDATE bookings SET station=1");
+  assert.equal((await api(device)).status, 200);
+  assert.equal((await api(device)).status, 200);
+  assert.equal((await api('b'.repeat(32))).status, 409);
+});
+
 function database() {
   const db = new DatabaseSync(':memory:');
   db.exec(readFileSync(new URL('./schema.sql', import.meta.url), 'utf8'));

@@ -187,6 +187,21 @@ async function ownerRoute(request, env, path) {
 }
 async function route(request, env, url) {
   const path = url.pathname;
+  if (path === '/counter/check-in' && request.method === 'POST') {
+    check(env.COUNTER_TOKEN && request.headers.get('Authorization') === 'Bearer ' + env.COUNTER_TOKEN,
+      'Shop PC sign-in required.', 401);
+    const { id, device } = await request.json();
+    check(typeof id === 'string' && /^[0-9a-f-]{36}$/i.test(id) &&
+      typeof device === 'string' && /^[0-9a-f]{32}$/.test(device), 'Invalid check-in.');
+    const booking = await sql(env, `INSERT INTO booking_checkins (booking_id, device)
+      SELECT id, ? FROM bookings WHERE id=? AND status='confirmed' AND payment_id IS NOT NULL
+        AND amount>0 AND station=1 AND starts<=unixepoch() AND ends>unixepoch()
+      ON CONFLICT(booking_id) DO UPDATE SET device=excluded.device
+      WHERE booking_checkins.device=excluded.device RETURNING booking_id`, device, id.toLowerCase()).first();
+    check(booking, 'Booking is unavailable, outside its reserved time, or already checked in on another PC.', 409);
+    return reply(await sql(env, 'SELECT id, starts, ends, amount, payment_id FROM bookings WHERE id=?',
+      booking.booking_id).first());
+  }
   if (request.method === 'GET' && path === '/') {
     const config = await settings(env);
     check(config, 'Booking settings are unavailable.', 503);
