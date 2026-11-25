@@ -5,6 +5,9 @@ async function showCheckout(token) {
   const summary = document.querySelector("#summary");
   const button = document.querySelector("#pay");
   const status = document.querySelector("#status");
+  document.querySelector("#gaming-information").hidden = true;
+  document.querySelector("#shop-information").hidden = true;
+  document.title = "Pay for your gaming session | Wildcat IT Solutions";
   checkout.hidden = false;
   status.textContent = "Loading your payment link…";
 
@@ -15,6 +18,7 @@ async function showCheckout(token) {
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({token, ...fields})
     });
+    if (response.status >= 500) throw new Error("The shop's payment service is offline. Ask staff to check the connection.");
     const result = await response.json();
     if (!response.ok) throw new Error(result.error);
     return result;
@@ -88,6 +92,7 @@ async function showCheckout(token) {
         stopped(error.message || "Could not open Razorpay. Please ask the shop to check your link.");
       }
     };
+    await button.onclick();
   } catch (error) {
     status.textContent = error.message === "Failed to fetch"
       ? "The shop's payment service is unavailable. Please ask the shop staff for help."
