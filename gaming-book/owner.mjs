@@ -93,6 +93,7 @@ signin.addEventListener('submit', async event => {
     signin.hidden = true;
     document.querySelector('#panel').hidden = false;
     status.textContent = '';
+    void loadHistory();
   } catch (error) {
     token = null;
     status.textContent = error.message;
@@ -137,3 +138,37 @@ session.addEventListener('submit', async event => {
 setInterval(() => {
   if (token && !document.hidden) refresh().catch(() => {});
 }, 5000);
+
+const historyList = document.querySelector('#booking-history');
+const historyStatus = document.querySelector('#history-status');
+const historyMore = document.querySelector('#history-more');
+let historyOffset = 0;
+
+async function loadHistory() {
+  historyMore.disabled = true;
+  historyStatus.textContent = 'Loading booking history…';
+  try {
+    const result = await request('/owner/history?offset=' + historyOffset, null, token);
+    for (const booking of result.bookings) {
+      const row = document.createElement('li');
+      const state = booking.status === 'cancelled' ? 'Cancelled' :
+        booking.status === 'payment_review' ? 'Payment requires review' :
+        booking.payment_id ? 'Paid · Reserved time ended' : 'Owner session · Reserved time ended';
+      row.textContent = format.format(booking.starts * 1000) + ' to ' +
+        format.format(booking.ends * 1000) + ' IST · Station ' + booking.station +
+        ' · ' + booking.name + ' · ' + state + ' · ' + rupees(booking.amount) + ' · ' + booking.id;
+      historyList.append(row);
+    }
+    historyOffset += result.bookings.length;
+    historyStatus.textContent = historyOffset ? '' : 'No past or cancelled bookings yet.';
+    historyMore.hidden = !result.more;
+    historyMore.textContent = 'Load older bookings';
+  } catch (error) {
+    historyStatus.textContent = error.message;
+    historyMore.hidden = false;
+    historyMore.textContent = 'Retry';
+  } finally {
+    historyMore.disabled = false;
+  }
+}
+historyMore.addEventListener('click', loadHistory);

@@ -2,7 +2,7 @@
 <html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex"><title>Gaming schedule | Wildcat</title>
 <link rel="stylesheet" href="/assets/index-Y5XlWWtQ.css"><link rel="stylesheet" href="../booking.css">
-<script type="module" src="../owner.mjs"></script></head>
+<script type="module" src="../owner.mjs?v=history1"></script></head>
 <body class="local-page"><header class="local-header"><a href="/">Wildcat IT Solutions</a></header>
 <main><div class="local-intro"><h1>Gaming schedule</h1></div>
 <section><form id="signin"><label>Owner access token <input name="token" type="password" required></label>
@@ -26,4 +26,6 @@
 <input name="reference" required maxlength="36" autocomplete="off"></label>
 <button>Check booking</button></form><p id="verify-result" role="status"></p></section>
 <section><h2>Upcoming sessions and payment reviews</h2><ul id="schedule"></ul></section>
+<section><h2>Booking history</h2><p id="history-status" role="status"></p><ul id="booking-history"></ul>
+<button id="history-more" type="button" hidden>Load older bookings</button></section>
 </div></main></body></html>
