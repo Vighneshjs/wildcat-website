@@ -10,13 +10,15 @@ function check(condition, message, status = 400) {
 }
 const validTime = /^(?:[01]\d|2[0-3]):(?:00|30)$/;
 const instant = (date, time) => Date.parse(date + 'T' + time + ':00+05:30') / 1000;
-function windowFor(date, config) {
+const firstCustomerDate = '2026-12-01';
+function windowFor(date, config, owner = false) {
   check(typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date), 'Choose a valid date.');
   const midnight = instant(date, '00:00');
   const today = Math.floor((now() + 19800) / DAY) * DAY - 19800;
   check(midnight >= today && midnight <= today + 14 * DAY &&
     new Date((midnight + 19800) * 1000).toISOString().slice(0, 10) === date,
     'Choose a valid date within the next 14 days.');
+  check(owner || date >= firstCustomerDate, 'Online sessions start on December 1, 2026.');
   return [instant(date, config.opens), instant(date, config.closes)];
 }
 function lengthOf(minutes) {
@@ -64,7 +66,7 @@ async function availability(env, params, config) {
   return { slots, amount: customerAmount(minutes, config), online: availableOnline(env, config) };
 }
 async function reserve(env, data, config, owner) {
-  const [open, close] = windowFor(data.date, config);
+  const [open, close] = windowFor(data.date, config, owner);
   check(typeof data.time === 'string' && validTime.test(data.time) && (owner || data.time.endsWith(':00')),
     owner ? 'Choose a start time.' : 'Choose a start time on the hour.');
   const start = instant(data.date, data.time);

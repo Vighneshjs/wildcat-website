@@ -6,7 +6,8 @@ const indiaDate = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit"
 });
 
-bookingForm.elements.date.min = indiaDate.format(new Date());
+const today = indiaDate.format(new Date());
+bookingForm.elements.date.min = today < "2026-12-01" ? "2026-12-01" : today;
 bookingForm.hidden = false;
 
 bookingForm.addEventListener("submit", event => {

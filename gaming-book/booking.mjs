@@ -20,8 +20,9 @@ let locked = false;
 let sequence = 0;
 let result;
 let visibleTimes = '';
-date.value = date.min = dateInIndia();
-date.max = new Date(Date.parse(date.min) + 14 * 86400000).toISOString().slice(0, 10);
+const today = dateInIndia();
+date.value = date.min = today < '2026-12-01' ? '2026-12-01' : today;
+date.max = new Date(Date.parse(today) + 14 * 86400000).toISOString().slice(0, 10);
 
 function updateSummary() {
   const time = form.elements.time?.value;
