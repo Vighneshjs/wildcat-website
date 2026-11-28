@@ -1,3 +1,5 @@
+const launchCoupon = 'WILDCATFREE';
+const launchLimit = 5;
 const BLOCK = 1800;
 const HOUR = 3600;
 const DAY = 86400;
@@ -63,7 +65,11 @@ async function availability(env, params, config) {
     slots.push({ time: new Date((start + 19800) * 1000).toISOString().slice(11, 16), remaining,
       status: remaining ? 'available' : withoutHolds ? 'held' : 'booked' });
   }
-  return { slots, amount: customerAmount(minutes, config), online: availableOnline(env, config) };
+  const online = availableOnline(env, config);
+  const redeemed = online ? await sql(env, 'SELECT COUNT(*) AS total FROM bookings WHERE coupon_code=?',
+    launchCoupon).first() : null;
+  const remaining = redeemed ? Math.max(0, launchLimit - redeemed.total) : 0;
+  return { slots, offer: remaining ? { code: launchCoupon, remaining } : null, amount: customerAmount(minutes, config), online: availableOnline(env, config) };
 }
 async function reserve(env, data, config, owner) {
   const [open, close] = windowFor(data.date, config, owner);
@@ -78,10 +84,13 @@ async function reserve(env, data, config, owner) {
   check(name.length >= 2 && name.length <= 80 && ((owner && !phone) || /^\+?\d{10,15}$/.test(phone)),
     'Enter a name and a valid mobile number.');
   check(owner || availableOnline(env, config), 'Online booking is currently closed.', 503);
-  const amount = owner ? 0 : customerAmount(data.minutes, config);
+  const coupon = !owner && data.coupon ? String(data.coupon).trim().toUpperCase() : null;
+  check(!coupon || coupon === launchCoupon && data.minutes === 60, 'WILDCATFREE applies to one-hour sessions only.');
+  const confirmed = owner || Boolean(coupon);
+  const amount = confirmed ? 0 : customerAmount(data.minutes, config);
   const id = owner && data.id ? data.id : crypto.randomUUID();
   const editing = owner && Boolean(data.id);
-  const expires = owner ? null : Math.min(now() + 600, start);
+  const expires = confirmed ? null : Math.min(now() + 600, start);
   const stations = owner && data.station != null ? [data.station] :
     Array.from({ length: config.stations }, (_, index) => index + 1);
   check(stations.every(station => Number.isInteger(station) && station >= 1 && station <= config.stations),
@@ -100,8 +109,8 @@ async function reserve(env, data, config, owner) {
       batch.push(editing
         ? sql(env, `UPDATE bookings SET name=?,phone=?,starts=?,ends=?,station=?
           WHERE id=? AND status='confirmed' AND amount=0 AND ends>unixepoch()`, name, phone, start, end, station, id)
-        : sql(env, `INSERT INTO bookings(id,name,phone,starts,ends,station,amount,expires,status)
-          VALUES (?,?,?,?,?,?,?,?,?)`, id, name, phone, start, end, station, amount, expires, owner ? 'confirmed' : 'held'));
+        : sql(env, `INSERT INTO bookings(id,name,phone,starts,ends,station,amount,expires,status,coupon_code)
+          VALUES (?,?,?,?,?,?,?,?,?,?)`, id, name, phone, start, end, station, amount, expires, confirmed ? 'confirmed' : 'held', coupon));
       for (let block = start; block < end; block += BLOCK) {
         batch.push(editing
           ? sql(env, `INSERT INTO blocks SELECT ?,?,id FROM bookings WHERE id=? AND status='confirmed' AND amount=0 AND ends>unixepoch()`,
@@ -110,8 +119,10 @@ async function reserve(env, data, config, owner) {
       }
       const results = await env.DB.batch(batch);
       check(results[updateIndex].meta.changes, 'This owner session is unavailable for editing.', 409);
-      return { id, station, amount, expires };
+      return { id, station, amount, expires, status: confirmed ? 'confirmed' : 'held', coupon };
     } catch (error) {
+      check(!String(error.message).includes('launch_coupon_exhausted'),
+        'All five free sessions have been claimed. Remove the coupon to continue with a paid booking.', 409);
       if (!String(error.message).includes('UNIQUE constraint failed: blocks.station, blocks.starts')) throw error;
     }
   }
@@ -152,7 +163,7 @@ async function ownerRoute(request, env, path) {
   if (request.method === 'GET' && path === '/owner/verify') {
     const id = new URL(request.url).searchParams.get('id')?.trim();
     check(/^[0-9a-f-]{36}$/i.test(id || ''), 'Enter the full booking reference.');
-    const booking = await sql(env, `SELECT id, starts, ends, station, amount, status, payment_id
+    const booking = await sql(env, `SELECT id, starts, ends, station, amount, status, payment_id, coupon_code
       FROM bookings WHERE id=?`, id.toLowerCase()).first();
     check(booking, 'No booking matches this reference.', 404);
     return reply(booking);
@@ -196,8 +207,7 @@ async function route(request, env, url) {
     check(typeof id === 'string' && /^[0-9a-f-]{36}$/i.test(id) &&
       typeof device === 'string' && /^[0-9a-f]{32}$/.test(device), 'Invalid check-in.');
     const booking = await sql(env, `INSERT INTO booking_checkins (booking_id, device)
-      SELECT id, ? FROM bookings WHERE id=? AND status='confirmed' AND payment_id IS NOT NULL
-        AND amount>0 AND station=1 AND starts<=unixepoch() AND ends>unixepoch()
+      SELECT id, ? FROM bookings WHERE id=? AND status='confirmed' AND ((payment_id IS NOT NULL AND amount>0) OR coupon_code='WILDCATFREE') AND station=1 AND starts<=unixepoch() AND ends>unixepoch()
       ON CONFLICT(booking_id) DO UPDATE SET device=excluded.device
       WHERE booking_checkins.device=excluded.device RETURNING booking_id`, device, id.toLowerCase()).first();
     check(booking, 'Booking is unavailable, outside its reserved time, or already checked in on another PC.', 409);
@@ -230,6 +240,7 @@ async function route(request, env, url) {
   const data = await request.json();
   if (path === '/bookings') {
     const booking = await reserve(env, data, await settings(env), false);
+    if (booking.coupon) return reply(booking, 201);
     try {
       const order = await gateway(env, 'orders', { amount: booking.amount, currency: 'INR', receipt: booking.id });
       check(order.id && order.amount === booking.amount && order.currency === 'INR',

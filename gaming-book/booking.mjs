@@ -6,6 +6,7 @@ const get = id => document.getElementById(id);
 const times = get('times');
 const pay = get('pay');
 const status = get('status');
+let coupon = '';
 const clock = new Intl.DateTimeFormat('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
 const calendar = new Intl.DateTimeFormat('en-IN', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Asia/Kolkata' });
 function formatRange(day, time, length) {
@@ -27,10 +28,16 @@ date.max = new Date(Date.parse(today) + 14 * 86400000).toISOString().slice(0, 10
 function updateSummary() {
   const time = form.elements.time?.value;
   if (!locked) get('selection').textContent = time ? describe({ date: date.value, time, minutes: minutes.value }) : 'Choose a start time';
-  get('amount').textContent = result?.amount > 0 ? rupees(result.amount) : '—';
+  const offer = result?.offer;
+  const free = Boolean(coupon && offer?.code === coupon && minutes.value === '60');
+  get('launch-offer').hidden = !offer || locked;
+  get('offer-count').textContent = offer ? offer.remaining + ' of 5 free one-hour bookings left' : '';
+  get('claim-coupon').textContent = free ? 'Remove ' + coupon : 'Claim your free coupon';
+  get('claim-coupon').disabled = busy;
+  get('amount').textContent = free ? rupees(0) : result?.amount > 0 ? rupees(result.amount) : '—';
   pay.disabled = busy || locked || !result?.online || !time;
-  pay.textContent = result?.online ? 'Pay ' + rupees(result.amount) : 'Online booking unavailable';
-  get('payment-note').textContent = result?.online ? 'Secure checkout with Razorpay' : 'Request a slot on WhatsApp or call the gaming café.';
+  pay.textContent = free ? 'Confirm free booking' : result?.online ? 'Pay ' + rupees(result.amount) : 'Online booking unavailable';
+  get('payment-note').textContent = free ? 'WILDCATFREE applied. Your slot is reserved when you confirm.' : result?.online ? 'Secure checkout with Razorpay' : 'Request a slot on WhatsApp or call the gaming café.';
 }
 
 async function refresh() {
@@ -68,6 +75,10 @@ async function refresh() {
     }
     const message = slots.some(slot => slot.remaining) ? '' : 'No times available. Try another date or a shorter session.';
     if (get('availability').textContent !== message) get('availability').textContent = message;
+    if (coupon && !latest.offer) {
+      coupon = '';
+      if (!locked) status.textContent = 'All five free sessions have been claimed. Review the price before paying.';
+    }
     result = latest;
   } catch {
     if (requestNumber !== sequence) return;
@@ -79,6 +90,7 @@ async function refresh() {
 
 form.addEventListener('change', event => {
   if (event.target === date || event.target === minutes) {
+    if (event.target === minutes) coupon = '';
     result = undefined;
     visibleTimes = '';
     times.replaceChildren();
@@ -97,11 +109,32 @@ get('copy').addEventListener('click', async () => {
   }
 });
 
+get('claim-coupon').addEventListener('click', () => {
+  if (!result?.offer || busy || locked) return;
+  coupon = result.offer.code;
+  if (minutes.value !== '60') {
+    minutes.value = '60';
+    minutes.dispatchEvent(new Event('change', { bubbles: true }));
+    coupon = 'WILDCATFREE';
+  }
+  updateSummary();
+});
+
+function showConfirmation(booking, details, message) {
+  locked = true;
+  status.textContent = message;
+  get('confirmed-slot').textContent = describe(details);
+  get('reference').textContent = booking.id;
+  get('confirmation').hidden = false;
+  get('copy').focus();
+}
+
 form.addEventListener('submit', async event => {
   event.preventDefault();
   if (pay.disabled) return;
   const details = Object.fromEntries(new FormData(form));
   details.minutes = Number(details.minutes);
+  if (coupon) details.coupon = coupon;
   details.phone = details.phone.replace(/[\s()-]/g, '');
   if (!/^\+?\d{10,15}$/.test(details.phone)) {
     status.textContent = 'Enter a valid mobile number.';
@@ -113,8 +146,13 @@ form.addEventListener('submit', async event => {
   status.textContent = 'Reserving your time…';
   const unlock = () => { busy = false; updateSummary(); refresh(); };
   try {
-    if (!window.Razorpay) throw new Error('Checkout could not load. Refresh the page and try again.');
+    if (!details.coupon && !window.Razorpay) throw new Error('Checkout could not load. Refresh the page and try again.');
     const booking = await request('/bookings', details);
+    if (booking.status === 'confirmed' && booking.coupon) {
+      showConfirmation(booking, details, 'Free one-hour booking confirmed.');
+      unlock();
+      return;
+    }
     status.textContent = 'Your time is held until ' + clock.format(booking.expires * 1000) + ' IST.';
     new window.Razorpay({
       key: booking.key, order_id: booking.orderId, amount: booking.amount, currency: 'INR',
@@ -132,11 +170,7 @@ form.addEventListener('submit', async event => {
           const verified = await request('/verify', { id: booking.id,
             paymentId: payment.razorpay_payment_id, signature: payment.razorpay_signature });
           if (verified.status === 'confirmed') {
-            status.textContent = 'Payment verified.';
-            get('confirmed-slot').textContent = describe(details);
-            get('reference').textContent = booking.id;
-            get('confirmation').hidden = false;
-            get('copy').focus();
+            showConfirmation(booking, details, 'Payment verified.');
           } else {
             status.textContent = 'Payment arrived after the hold expired. Call the shop with reference ' + booking.id + '.';
           }

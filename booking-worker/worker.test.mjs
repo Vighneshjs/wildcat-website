@@ -10,7 +10,7 @@ test('paid check-in is time-bound, station-bound and retryable only by the same 
   DB.db.exec(readFileSync(new URL('./counter-checkins.sql', import.meta.url), 'utf8'));
   const id = '00000000-0000-4000-8000-000000000001';
   DB.db.prepare(`INSERT INTO bookings VALUES (?, 'Player', '', unixepoch()-10,
-    unixepoch()+3590, 1, 20000, NULL, 'confirmed', 'order_fixture', NULL)`).run(id);
+    unixepoch()+3590, 1, 20000, NULL, 'confirmed', 'order_fixture', NULL, NULL)`).run(id);
   const api = (device, token = 'counter-test') => worker.fetch(new Request('https://example.net/counter/check-in', {
     method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: JSON.stringify({ id, device }),
   }), { DB, COUNTER_TOKEN: 'counter-test' });
@@ -153,4 +153,35 @@ test('Razorpay Test Mode creates an order for the selected package', {
   assert.match(booking.orderId, /^order_/);
   assert.equal(booking.amount, 35000);
   assert.equal(DB.db.prepare('SELECT COUNT(*) AS count FROM blocks').get().count, 4);
+});
+
+test('five free launch coupons are confirmed, capped and eligible for counter check-in', async () => {
+  const DB = database();
+  DB.db.exec(readFileSync(new URL('./counter-checkins.sql', import.meta.url), 'utf8'));
+  DB.db.exec('UPDATE settings SET online=1');
+  const env = { DB, SITE_ORIGIN: 'https://staging.example.net', COUNTER_TOKEN: 'counter-test',
+    RAZORPAY_KEY_ID: 'rzp_test_fixture', RAZORPAY_KEY_SECRET: 'fixture', RAZORPAY_WEBHOOK_SECRET: 'fixture' };
+  const tomorrow = new Date(Date.now() + 106200000).toISOString().slice(0, 10);
+  const date = tomorrow < '2026-12-01' ? '2026-12-01' : tomorrow;
+  const call = (path, data, headers) => worker.fetch(new Request('https://staging.example.net' + path,
+    { method: data ? 'POST' : 'GET', headers, body: data && JSON.stringify(data) }), env);
+  const availability = async () => (await call('/availability?date=' + date + '&minutes=60')).json();
+  const booking = { date, time: '10:00', minutes: 60, name: 'Launch QA', phone: '9876543210', coupon: 'wildcatfree' };
+  assert.equal((await availability()).offer.remaining, 5);
+  assert.equal((await call('/bookings', { ...booking, minutes: 120 })).status, 400);
+  const first = await (await call('/bookings', booking)).json();
+  assert.equal(first.status, 'confirmed');
+  assert.equal(first.amount, 0);
+  assert.equal((await call('/bookings', booking)).status, 409);
+  assert.equal((await availability()).offer.remaining, 4);
+  const attempts = await Promise.all(['11:00', '12:00', '13:00', '14:00', '15:00']
+    .map(time => call('/bookings', { ...booking, time })));
+  assert.deepEqual(attempts.map(response => response.status).sort(), [201, 201, 201, 201, 409]);
+  assert.equal((await availability()).offer, null);
+  assert.equal(DB.db.prepare('SELECT COUNT(*) AS total FROM bookings').get().total, 5);
+  DB.db.prepare('UPDATE bookings SET starts=unixepoch()-10, ends=unixepoch()+3590 WHERE id=?').run(first.id);
+  const checkIn = await call('/counter/check-in', { id: first.id, device: 'a'.repeat(32) },
+    { Authorization: 'Bearer counter-test' });
+  assert.equal(checkIn.status, 200);
+  assert.equal((await checkIn.json()).amount, 0);
 });

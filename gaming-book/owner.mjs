@@ -32,7 +32,7 @@ function bookingRow(booking) {
   badge.dataset.state = booking.status === 'confirmed' && booking.payment_id ? 'paid' : booking.status;
   badge.textContent = booking.status === 'cancelled' ? 'Cancelled' :
     booking.status === 'payment_review' ? 'Payment needs review' :
-    booking.payment_id ? 'Payment verified' : 'Owner reservation';
+    booking.payment_id ? 'Payment verified' : booking.coupon_code ? 'Free launch booking' : 'Owner reservation';
   const details = document.createElement('dl');
   for (const [label, value] of [
     ['Reserved time (IST)', format.format(booking.starts * 1000) + ' to ' + format.format(booking.ends * 1000)],
@@ -140,7 +140,7 @@ verification.addEventListener('submit', async event => {
   try {
     const id = verification.elements.reference.value.trim();
     const booking = await request('/owner/verify?id=' + encodeURIComponent(id), null, token);
-    const states = { held: 'Awaiting payment', confirmed: booking.payment_id ? 'Paid and confirmed' : 'Owner reservation',
+    const states = { held: 'Awaiting payment', confirmed: booking.payment_id ? 'Paid and confirmed' : booking.coupon_code ? 'Free launch booking' : 'Owner reservation',
       payment_review: 'Payment requires review', cancelled: 'Cancelled' };
     output.textContent = (states[booking.status] || booking.status) + ' · ' +
       format.format(booking.starts * 1000) + ' to ' + format.format(booking.ends * 1000) +

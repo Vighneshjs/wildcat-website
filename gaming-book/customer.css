@@ -46,3 +46,10 @@ legend span{font-weight:400;color:var(--muted);margin-left:.25rem}
 @media(max-width:25rem){.fields{grid-template-columns:1fr;gap:.65rem}}
 .brand img{width:clamp(6rem,25vw,9.5rem);height:auto}
 .times input:disabled{cursor:not-allowed}.times input:disabled + span{background:#211919;color:#cbb6b6;border-style:dashed}.times small{font-size:.82rem;line-height:1.1}
+
+.launch-offer{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:0 0 1rem;padding:1.15rem 1.4rem;border:1px solid #943948;border-radius:.75rem;background:radial-gradient(ellipse at top right,#631f30 0,transparent 65%),linear-gradient(115deg,#31151d,#1b1216);color:#fff4f5}
+.launch-offer[hidden]{display:none}
+.launch-offer p{margin:.35rem 0 0;color:#ffd8de}
+.launch-offer button{flex:none;min-height:2.8rem;padding:.65rem 1rem;border:1px solid #ff8192;border-radius:.45rem;background:#ffc1ca;color:#2d1017;font-weight:700;cursor:pointer}
+.launch-offer button:disabled{background:#3b2028;color:#ffe2e7;cursor:default}
+@media(max-width:38rem){.launch-offer{align-items:stretch;flex-direction:column}}
